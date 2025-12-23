@@ -457,14 +457,14 @@ function generateFullReport(p, apiKey) {
     ${p.timeAnimal !== "Тодорхойгүй" ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)` : ""}
     🔢 **Амьдралын тоо:** ${p.lifePath}
     
-    📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР
+    **📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР**
     - Analyze the mix of ${p.yearAnimal} and ${p.zodiacSign}. Use the concept "${p.elementRelationship}" but write it poetically (e.g., "Fire and Water dance in your soul...").
     - Contrast their outer appearance (Mask) vs inner reality (Truth).
     ${p.timeAnimal !== "Тодорхойгүй" ? `- Analyze ${p.timeAnimal} birth hour influence on their hidden self.` : "(User does not know birth time, so SILENTLY SKIP the birth hour section. Do NOT mention that the time is unknown. Just move to the next topic naturally.)"}
     - Explain Life Path ${p.lifePath} and Birth Day ${p.birthDayNum}.
       * IMPORTANT: Briefly explain HOW this number was calculated (summing digits of ${p.dob}) to build trust. If it is a Master Number (11, 22, 33), explain why we didn't reduce it further. (Mention Karmic Debt if 13, 14, 16, 19).
 
-    📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ
+    **📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ**
     - What is their "Love Language"? What do they crave?
     - Their Shadow Side: Why do they fail? (e.g., Saviour Complex, too demanding).
     - Compatibility: Who fits them? Who destroys them?
@@ -480,7 +480,7 @@ function generateFullReport(p, apiKey) {
     TASK: Write PART 2 (Chapters 3 & 4).
     CONTEXT: We already discussed their character (${p.yearAnimal}, ${p.zodiacSign}). Now focus on their Future Partner and Timing.
     
-    📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"
+    **📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"**
     - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles to separate the sections.
     - TARGET: The partner must be MONGOLIAN (No blue eyes/blonde hair). Describe realistic Mongolian features.
     - GENDER: Remember to describe the OPPOSITE gender of ${p.gender}.
@@ -489,7 +489,7 @@ function generateFullReport(p, apiKey) {
       **2. Зан чанар:** (Describe personality)
       **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
     
-    📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД
+    **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
     - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
       * 1-р Хаалга: ${p.transit2025}
       * 2-р Хаалга: ${p.transit2026}
@@ -509,7 +509,7 @@ function generateFullReport(p, apiKey) {
     CONTEXT: The report continues from the Transits section.
     IMPORTANT: Do NOT write Chapter 6, Rituals, Imago Effect, or Conclusion. These are already pre-written in the template. Just finish Chapter 5.
     
-    📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ (${forecastYear} ОН - ${nextYearAnimal.toUpperCase()} ЖИЛ)
+    **📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ (${forecastYear} ОН - ${nextYearAnimal.toUpperCase()} ЖИЛ)**
     (Context: We are forecasting for ${forecastYear}. If today is late 2025, we focus on 2026).
     - How does the ${nextYearAnimal} Year (${forecastYear}) affect a ${p.yearAnimal}? 
     - General Outlook & Career/Money advice.
