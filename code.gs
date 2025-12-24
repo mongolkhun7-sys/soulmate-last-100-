@@ -1,18 +1,18 @@
 /****************************************************************************************
- * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (ZURHAI AI)
- * VERSION: v2.8 - Final Release (Time Logic, Grammar, Logging & Transits)
+ * PRODUCT: LIFE CODE: Personal Data Report
+ * VERSION: v3.0 - Analytical Edition
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v2.8-AstroMaster",
-  PRODUCT_NAME: "Таны Хувь Заяаны Код - Дэлгэрэнгүй Тайлан",
+  VERSION: "v3.0-LifeCode",
+  PRODUCT_NAME: "LIFE CODE: Personal Data Report",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, // Lower batch size for longer generation
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.8, // Slightly creative but grounded in logic
+  TEMPERATURE: 0.6, // Analytical & Precise
 
   // --- COLUMN MAPPING (0-based) ---
   // Expected Input Format: "Name - YYYY.MM.DD - HH:MM - Gender"
@@ -72,7 +72,7 @@ const CONFIG = {
     { name: "Нум", element: "Гал", start: "11-22", end: "12-21" }
   ],
 
-  DELIVERY_MESSAGE: `🔮 Сайн байна уу, {{NAME}}? \n\nЧиний "Хувь Заяаны Код" тайлагдлаа. Энэ бол зүгээр нэг зурхай биш, чиний дотоод ертөнцийн газрын зураг юм.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай, линк 7 хоногийн дараа устаж магадгүй)`,
+  DELIVERY_MESSAGE: `🔮 Сайн байна уу, {{NAME}}? \n\nЧиний "Life Code" тайлагдлаа. Энэ бол зүгээр нэг зурхай биш, чиний өгөгдлийн шинжилгээ юм.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай, линк 7 хоногийн дараа устаж магадгүй)`,
 };
 
 // --- MAIN FUNCTION ---
@@ -121,7 +121,7 @@ function main() {
         // 1. PARSE & CALCULATE (The Brain)
         const profile = parseAndCalculateProfile(inputString);
         
-        // 2. GENERATE CONTENT (The Artist)
+        // 2. GENERATE CONTENT (The Analyst)
         const reportResult = generateFullReport(profile, KEYS.GEMINI);
         
         // 3. CREATE PDF
@@ -410,28 +410,27 @@ function generateFullReport(p, apiKey) {
   if (currentMonth >= 11) forecastYear = currentYear + 1; // If Nov/Dec, forecast next year
   
   // Hardcoded next year logic for consistency with user request if they are testing for "future"
-  // For now, let's just make sure 2026 is the main forecast if we are in late 2025.
-  // Actually, let's explicitly pass the years to Gemini so it knows.
   const nextYearAnimal = CONFIG.ANIMALS[(forecastYear - 1900) % 12];
   
-  // SYSTEM PROMPT
+  // SYSTEM PROMPT (NEW: DATA ANALYST PERSONA)
   const systemPrompt = `
-    ROLE: Professional Mongolian Astrologer & Psychologist.
-    TONE: Literary, poetic, deep, philosophical. Avoid robotic or dry translated phrases. Write like a wise mentor speaking to a soul.
-    LANGUAGE: Mongolian (Cyrillic). Use rich vocabulary.
+    ROLE: Expert Data Scientist & Astrological Strategist.
+    TONE: Analytical, Direct, Modern, Professional. "Business Insider" or "Psychology Today" style.
+    LANGUAGE: Mongolian (Cyrillic). Use modern terminology (e.g., 'Algorithm', 'Pattern', 'Energy Dynamics', 'Strategy').
 
     CRITICAL RULES:
-    1. NO INTRODUCTIONS: Do not say "Hello", "I am Saruulbat", or "Here is your report". Start directly with the Chapter Title.
-    2. NO BULLET POINTS: Do not use '*' or '-' for lists. Use full paragraphs or bold subheaders. The text must look like a book, not a PowerPoint slide.
-    3. FORMATTING: Use **BOLD** for important subheadings. Separate paragraphs with empty lines.
-    4. LANGUAGE PRECISION: Do not use weak words like "Магадгүй" (Maybe). Instead use "Өндөр магадлалтай" (High probability), "Танд тохионо" (Will happen to you), "Одод ингэж зааж байна" (The stars indicate).
-    5. ADDRESSING: Always address the user as "Чи" (You) - intimate and direct. Use "Чиний" (Your), "Чамайг" (You - accusative), "Чамд" (to You) naturally. NEVER use "Та" (Formal).
-    6. UNKNOWN TIME LOGIC: If 'Birth Time' or 'Ascendant' is "Тодорхойгүй" or "Unknown", DO NOT generate specific predictions based on the hour. Instead, explicitly state that since the birth time is unknown, the 'Hidden Self/Ascendant' reading is general.
-    7. BOLD SAFETY: When using ** for bold titles, you MUST close them (e.g., **Title**). NEVER leave them open like (**Title...). This is critical.
+    1. NO FLUFF: Avoid flowery, overly poetic, or superstitious language. Focus on "Patterns", "Tendencies", and "Optimization".
+    2. NO INTRODUCTIONS: Do not say "Hello", "I am..." Start directly with the Chapter Title.
+    3. NO BULLET POINTS: Do not use '*' or '-' for lists. Use full paragraphs or bold subheaders. The text must look like a book, not a PowerPoint slide.
+    4. FORMATTING: Use **BOLD** for important data points. Separate paragraphs with empty lines.
+    5. PERSPECTIVE: Instead of "The stars say...", use "Analysis indicates...", "Your data profile suggests...", or "Calculations show...".
+    6. ADDRESSING: Address the user as "Чи" (You) - direct and coaching style.
+    7. UNKNOWN TIME LOGIC: If 'Birth Time' or 'Ascendant' is "Тодорхойгүй" or "Unknown", DO NOT generate specific predictions based on the hour.
+    8. BOLD SAFETY: When using ** for bold titles, you MUST close them (e.g., **Title**). NEVER leave them open like (**Title...).
     
     USER PROFILE:
     - Name: ${p.name}
-    - Gender: ${p.gender} (IMPORTANT: The user is ${p.gender}. Therefore, the "Avatar/Future Partner" must be the OPPOSITE gender. If user is Female, Partner is Male. If user is Male, Partner is Female).
+    - Gender: ${p.gender} (IMPORTANT: The user is ${p.gender}. Therefore, the "Target Partner" must be the OPPOSITE gender. If user is Female, Partner is Male. If user is Male, Partner is Female).
     - Year: ${p.yearElement} ${p.yearAnimal}
     - Zodiac: ${p.zodiacSign} (${p.zodiacElement})
     - Birth Time: ${p.tob} (${p.timeAnimal} hour)
@@ -447,9 +446,9 @@ function generateFullReport(p, apiKey) {
     
     TASK: Write PART 1 (Chapters 1 & 2).
     
-    Start with a boxed summary of their astrological profile.
+    Start with a boxed summary of their profile.
     
-    **✨ ТАНЫ ЗУРХАЙН ТҮЛХҮҮР ӨГӨГДЛҮҮД**
+    **✨ LIFE CODE: PERSONAL DATA SUMMARY**
     👤 **Нэр:** ${p.name}
     📅 **Төрсөн огноо:** ${p.dob}
     🐉 **Монгол жил:** ${p.yearElement} ${p.yearAnimal}
@@ -457,17 +456,17 @@ function generateFullReport(p, apiKey) {
     ${p.timeAnimal !== "Тодорхойгүй" ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)` : ""}
     🔢 **Амьдралын тоо:** ${p.lifePath}
     
-    **📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР**
-    - Analyze the mix of ${p.yearAnimal} and ${p.zodiacSign}. Use the concept "${p.elementRelationship}" but write it poetically (e.g., "Fire and Water dance in your soul...").
-    - Contrast their outer appearance (Mask) vs inner reality (Truth).
-    ${p.timeAnimal !== "Тодорхойгүй" ? `- Analyze ${p.timeAnimal} birth hour influence on their hidden self.` : "(User does not know birth time, so SILENTLY SKIP the birth hour section. Do NOT mention that the time is unknown. Just move to the next topic naturally.)"}
-    - Explain Life Path ${p.lifePath} and Birth Day ${p.birthDayNum}.
-      * IMPORTANT: Briefly explain HOW this number was calculated (summing digits of ${p.dob}) to build trust. If it is a Master Number (11, 22, 33), explain why we didn't reduce it further. (Mention Karmic Debt if 13, 14, 16, 19).
+    **📊 БҮЛЭГ 1: ҮНДСЭН ӨГӨГДЛИЙН ШИНЖИЛГЭЭ**
+    - Analyze the mix of ${p.yearAnimal} and ${p.zodiacSign} as a "System Architecture".
+    - Explain their "Core Operating System" (Inner Self) vs "User Interface" (Outer Mask).
+    - Use the concept "${p.elementRelationship}" to explain internal energy dynamics (e.g., "Conflict in the code" or "Optimized flow").
+    ${p.timeAnimal !== "Тодорхойгүй" ? `- Analyze ${p.timeAnimal} birth hour as a "Hidden Subroutine".` : ""}
+    - Explain Life Path ${p.lifePath} and Birth Day ${p.birthDayNum} as their "Source Code". Mention calculation method briefly for transparency.
 
-    **📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ**
-    - What is their "Love Language"? What do they crave?
-    - Their Shadow Side: Why do they fail? (e.g., Saviour Complex, too demanding).
-    - Compatibility: Who fits them? Who destroys them?
+    **❤️ БҮЛЭГ 2: ХАРИЛЦААНЫ АЛГОРИТМ БА НИЙЦЭЛ**
+    - What is their "Love Language" or "Connection Protocol"?
+    - Their "System Bugs" in relationships: Why do they fail? (Shadow Side).
+    - Compatibility Metrics: Who is a "Match"? Who creates a "System Crash"?
     
     (Write in deep, flowing paragraphs. NO BULLETS).
   `;
@@ -478,24 +477,24 @@ function generateFullReport(p, apiKey) {
     ${systemPrompt}
     
     TASK: Write PART 2 (Chapters 3 & 4).
-    CONTEXT: We already discussed their character (${p.yearAnimal}, ${p.zodiacSign}). Now focus on their Future Partner and Timing.
+    CONTEXT: We already analyzed their system. Now focus on Partner Profiling and Timeline Strategy.
     
-    **📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"**
-    - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles to separate the sections.
-    - TARGET: The partner must be MONGOLIAN (No blue eyes/blonde hair). Describe realistic Mongolian features.
-    - GENDER: Remember to describe the OPPOSITE gender of ${p.gender}.
+    **👤 БҮЛЭГ 3: ТОХИРОХ ХҮНИЙ ТӨРХ БА ШИНЖ ЧАНАР**
+    - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles.
+    - TARGET: The partner must be MONGOLIAN.
+    - GENDER: Describe the OPPOSITE gender of ${p.gender}.
     - Structure:
-      **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
-      **2. Зан чанар:** (Describe personality)
-      **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
+      **1. Гадаад төрх (Visual Data):** (Describe appearance and aura)
+      **2. Зан чанар (Personality Metrics):** (Describe personality traits)
+      **3. Ажил мэргэжил (Career Probability):** (Describe likely professions)
     
-    **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
-    - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
-      * 1-р Хаалга: ${p.transit2025}
-      * 2-р Хаалга: ${p.transit2026}
-      * 3-р Хаалга: ${p.transit2027}
-    - Explain WHY these years are significant (Trine, Jupiter Return, etc) based on the status provided.
-    - Provide advice for each period.
+    **⏳ БҮЛЭГ 4: ХУВЬ ЗАЯАНЫ ЭРГЭЛТИЙН ЦЭГҮҮД**
+    - Analyze these "Opportunity Windows" (Strategic Years):
+      * 1-р Цонх: ${p.transit2025}
+      * 2-р Цонх: ${p.transit2026}
+      * 3-р Цонх: ${p.transit2027}
+    - Explain WHY these years are significant (Trine, Jupiter Return) but use terms like "High Growth Cycle" or "Challenge Phase".
+    - Provide strategic advice for each period.
     
     (Write in deep, flowing paragraphs. NO BULLETS).
   `;
@@ -506,14 +505,12 @@ function generateFullReport(p, apiKey) {
     ${systemPrompt}
     
     TASK: Write PART 3 (Chapter 5 ONLY).
-    CONTEXT: The report continues from the Transits section.
-    IMPORTANT: Do NOT write Chapter 6, Rituals, Imago Effect, or Conclusion. These are already pre-written in the template. Just finish Chapter 5.
     
-    **📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ (${forecastYear} ОН - ${nextYearAnimal.toUpperCase()} ЖИЛ)**
+    **📈 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ТӨЛӨВ БА СТРАТЕГИ (${forecastYear} ОН - ${nextYearAnimal.toUpperCase()} ЖИЛ)**
     (Context: We are forecasting for ${forecastYear}. If today is late 2025, we focus on 2026).
     - How does the ${nextYearAnimal} Year (${forecastYear}) affect a ${p.yearAnimal}? 
-    - General Outlook & Career/Money advice.
-    - Provide specific advice for maintaining balance in ${forecastYear}.
+    - Market Trend Analysis: General Outlook & Career/Money advice.
+    - Risk Management: Specific advice for maintaining balance in ${forecastYear}.
     
     (Write in deep, flowing paragraphs. NO BULLETS. STOP immediately after Chapter 5).
   `;
@@ -556,7 +553,7 @@ function callGemini(text, key) {
 
 function createPdf(name, content, templateId) {
   // 1. Copy Template
-  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Astro Report`);
+  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Life Code Report`);
   const doc = DocumentApp.openById(copy.getId());
   const body = doc.getBody();
 
