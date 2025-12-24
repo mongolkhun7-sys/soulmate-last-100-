@@ -1,13 +1,13 @@
 /****************************************************************************************
  * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (FINANCIAL & WEALTH)
- * VERSION: v3.2 - Financial Master Template (With Explanations)
+ * VERSION: v3.3 - Financial Master Template (Natural Explanations)
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v3.2-Financial-Explanations",
+  VERSION: "v3.3-Financial-Natural",
   PRODUCT_NAME: "Таны Санхүүгийн Код & Баяжих Зурхай",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
@@ -78,20 +78,20 @@ const CONFIG = {
       **📖 БҮЛЭГ 2: ТООН ЭНЕРГИЙН МАТРИЦ (NUMEROLOGY)**
 
       **1️⃣ ХУВЬ ТАВИЛАНГИЙН ТОО: {{destinyNumber}}**
-      *({{destinyCalc}})*
-      - Explain how this number shapes their main path to wealth. (Based on calculation: {{destinyNumber}}).
+      - Explain that this number comes from {{destinyCalc}}, but write it naturally in the sentence, not as a math equation.
+      - Explain how this number shapes their main path to wealth.
 
       **2️⃣ СҮНСНИЙ ТОО: {{soulNumber}}**
-      *({{soulCalc}})*
-      - Explain their inner emotional need for security or freedom. (Based on calculation: {{soulNumber}}).
+      - Explain that this number comes from {{soulCalc}}, but write it naturally in the sentence.
+      - Explain their inner emotional need for security or freedom.
 
       **3️⃣ ДОТООД ХҮСЛИЙН ТОО: {{innerDesireNumber}}**
-      *({{innerDesireCalc}})*
-      - What do they secretly crave financially? (Based on calculation: {{innerDesireNumber}}).
+      - Explain that this number comes from {{innerDesireCalc}}, but write it naturally in the sentence.
+      - What do they secretly crave financially?
 
       **4️⃣ ЗОРИЛГЫН ТОО: {{goalNumber}}**
-      *({{goalCalc}})*
-      - Their ultimate financial mission. (Based on calculation: {{goalNumber}}).
+      - Explain that this number comes from {{goalCalc}}, but write it naturally in the sentence.
+      - Their ultimate financial mission.
       
       (Write in deep, flowing paragraphs. NO BULLETS).
       `,
@@ -126,18 +126,15 @@ const CONFIG = {
       **📖 БҮЛЭГ 5: ИРЭЭДҮЙН 3 ЖИЛИЙН САНХҮҮГИЙН УРСГАЛ**
       
       **📅 {{year1}} ОН (ХУВИЙН ЖИЛ {{py1}})**
-      *({{py1Calc}})*
-      - Explain the energy of Personal Year {{py1}}. (e.g., Year 1 is new beginnings, Year 8 is harvest/money, Year 9 is completion).
+      - Explain that this personal year comes from {{py1Calc}}, but write it naturally in the sentence.
       - Financial Advice for this specific year.
 
       **📅 {{year2}} ОН (ХУВИЙН ЖИЛ {{py2}})**
-      *({{py2Calc}})*
-      - Explain the energy of Personal Year {{py2}}.
+      - Explain that this personal year comes from {{py2Calc}}, but write it naturally in the sentence.
       - What to avoid this year?
 
       **📅 {{year3}} ОН (ХУВИЙН ЖИЛ {{py3}})**
-      *({{py3Calc}})*
-      - Explain the energy of Personal Year {{py3}}.
+      - Explain that this personal year comes from {{py3Calc}}, but write it naturally in the sentence.
       - Key opportunities.
 
       **📖 БҮЛЭГ 6: САНХҮҮГИЙН ЭРХ ЧӨЛӨӨНД ХҮРЭХ ТҮЛХҮҮРҮҮД**
