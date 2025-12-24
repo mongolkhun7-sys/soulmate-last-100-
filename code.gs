@@ -1,18 +1,18 @@
 /****************************************************************************************
  * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (ZURHAI AI)
- * VERSION: v3.2 - SOULMATE PRO (Dual Template System)
+ * VERSION: v3.3 - SOULMATE PRO (Consistent Logic & Clean Format)
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v3.2-SoulmatePro",
+  VERSION: "v3.3-SoulmatePro",
   PRODUCT_NAME: "Таны Хувь Заяаны Код - Дэлгэрэнгүй Тайлан",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3,
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.8,
+  TEMPERATURE: 0.7, // Lowered slightly for better consistency
 
   // --- COLUMN MAPPING (0-based) ---
   COLUMNS: {
@@ -32,7 +32,7 @@ const CONFIG = {
   SAFETY_BUFFER: 60000,
 
   // ==================================================================================
-  // ⚙️ MASTER CONFIGURATION (EDIT HERE FOR NEW PRODUCTS)
+  // ⚙️ MASTER CONFIGURATION
   // ==================================================================================
 
   AI_SETTINGS: {
@@ -40,16 +40,15 @@ const CONFIG = {
     ROLE: "Professional Mongolian Astrologer & Psychologist specializing in Synastry (Relationship Astrology) and Karmic Astrology.",
 
     // 2. THE TONE OF VOICE
-    TONE: "Deep, empathetic, spiritual, and empowering. Use Mongolian cultural nuances but modern psychological terms. The tone should be like a wise mentor speaking to a close friend.",
+    TONE: "Deep, empathetic, spiritual, and empowering. Use Mongolian cultural nuances. Speak directly to the user (Using 'Чи').",
 
-    // 3. CORE RULES
+    // 3. CORE RULES (STRICT CONSISTENCY)
     CORE_RULES: `
-    1. NO INTRODUCTIONS: Start directly with the Chapter Title.
-    2. NO BULLET POINTS: Use full paragraphs or bold subheaders.
-    3. FORMATTING: Use **BOLD** for important subheadings. Separate paragraphs with empty lines.
-    4. LANGUAGE PRECISION: Use "Чи" (You). Avoid weak words.
-    5. PLANETARY CALCULATION: You are responsible for calculating the positions of Venus, Mars, Juno, and Moon based on the user's Birth Date. You must be accurate.
-    6. BOLD SAFETY: Always close bold tags (e.g., **Title**).
+    1. **CONSISTENCY IS KING**: Calculate planetary positions (Venus, Mars, Juno, Moon) ONCE based on the DOB. Store these in your 'memory' and use the SAME signs for Chapter 1 and Chapter 5. Do NOT change a sign halfway through the report.
+    2. **INTERNAL LOGIC**: The instructions provided in "Context" are for YOUR reasoning only. Do NOT print the calculation method or the "Why" unless asked. Only print the insight.
+    3. **NO DASHES**: Do NOT use '---' for separators. Use emojis like ✨, 🌿, or nothing at all.
+    4. **FORMATTING**: Use **BOLD** for subheadings. No bullet points (*). Use full, flowing paragraphs.
+    5. **LANGUAGE**: Mongolian Cyrillic. Warm, personal tone.
     `,
 
     // 4. CHAPTER PROMPTS (DUAL SYSTEM)
@@ -61,38 +60,41 @@ const CONFIG = {
 
       USER DATA:
       Name: {{name}} | DOB: {{dob}} | Gender: {{gender}}
-      Life Path Number: {{lifePath}} (Ensure you mention this is calculated from {{dob}})
+      Life Path Number: {{lifePath}}
+
+      **INTERNAL INSTRUCTION**:
+      1. Calculate Venus Sign and Moon Sign for {{dob}}. Remember them.
+      2. Calculate Juno and Mars Signs. Remember them.
+      3. Use Life Path {{lifePath}} for location predictions.
 
       **БҮЛЭГ 1: ЧИНИЙ ХАЙР ДУРЛАЛЫН КОД**
-      (Context: Calculate Venus and Moon positions for {{dob}}. Explain Love Language (Venus) and Emotional Needs (Moon)).
-      - **ТҮЛХҮҮР 1: ТАНЫ ХАЙРЫН ХЭЛЭМЖ (СУГАР ГАРАГ)**: Identify Venus sign. Explain how they flirt and love.
-      - **ТҮЛХҮҮР 2: ТАНЫ СЭТГЭЛ ЗҮРХНИЙ ХЭРЭГЦЭЭ (САР)**: Identify Moon sign. Explain their inner emotional needs.
-      - **ДҮГНЭЛТ**: Summarize their love code based on Venus/Moon mix.
+      - **ТҮЛХҮҮР 1: ТАНЫ ХАЙРЫН ХЭЛЭМЖ (СУГАР ГАРАГ)**: Identify the Venus sign you calculated. Explain love style (Direct/Shy/Logical) based on this sign.
+      - **ТҮЛХҮҮР 2: ТАНЫ СЭТГЭЛ ЗҮРХНИЙ ХЭРЭГЦЭЭ (САР)**: Identify the Moon sign. Explain emotional needs.
+      - **ДҮГНЭЛТ**: Synthesis of Venus and Moon.
 
       **БҮЛЭГ 2: ЗАЯАНЫ ХАНИЙН ДҮР ТӨРХ**
-      (Context: Use Juno and Mars positions).
-      - **ТҮЛХҮҮР 3: ГЭРЛЭЛТИЙН БУРХАН (ЮНО)**: Identify Juno sign. Describe the marriage partner's character.
-      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign. Describe the ideal protector/partner qualities.
-      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Synthesize Juno/Mars to describe partner's look and profession.
-      - **ДҮГНЭЛТ**: Summarize the partner's archetype (e.g., "The Gentle Healer").
+      - **ТҮЛХҮҮР 3: ГЭРЛЭЛТИЙН БУРХАН (ЮНО)**: Identify Juno sign. Describe the long-term partner's character (The one they marry, not just date).
+      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign. Describe the ideal protector qualities.
+      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Combine Juno and Mars to describe look and job.
+      - **ДҮГНЭЛТ**: Partner Archetype.
 
       **БҮЛЭГ 3: УЧРАХ НӨХЦӨЛ БА ГАЗАР (ТООН ЗУРХАЙ)**
-      (Context: Since time is unknown, use Life Path Number {{lifePath}}).
-      - **ТАНЫ ХУВЬ ЗАЯАНЫ ТОО**: Explain the calculation of {{lifePath}}.
-      - **ТҮҮНТЭЙ ХААНА ТАНИЛЦАХ ВЭ?**: Based on Life Path {{lifePath}}, predict the location (e.g., spiritual places for 11, work for 8).
-      - **АНХНЫ УЧРАЛ ЯМАР БАЙХ ВЭ?**: Describe the feeling of the first meeting based on numerology.
-      - **ДҮГНЭЛТ**: A spiritual summary of their destiny.
+      - **ТАНЫ ХУВЬ ЗАЯАНЫ ТОО**: Mention Life Path {{lifePath}}.
+      - **ТҮҮНТЭЙ ХААНА ТАНИЛЦАХ ВЭ?**: Use Numerology logic:
+        * If 11/22/33/7/9: Spiritual places, libraries, volunteering.
+        * If 1/5/8: Work, business, travel.
+        * If 2/4/6: Home gatherings, through friends.
+      - **АНХНЫ УЧРАЛ ЯМАР БАЙХ ВЭ?**: Describe the karmic feeling.
 
       **БҮЛЭГ 4: ХУГАЦААНЫ ТААМАГЛАЛ**
-      (Context: Use Jupiter Transits relative to their Sun Sign {{zodiacSign}}).
-      - **ТҮЛХҮҮР 6: АЗ ХИЙМОРИЙН ТОМ МӨЧЛӨГ**: Analyze Jupiter's movement for 2025-2026 relative to {{zodiacSign}}.
-      - **ОНЦЛОХ ӨДРҮҮД**: Mention specific months in 2026 where Venus or Jupiter aspects their Sun.
-      - **ТҮЛХҮҮР 7: АНХААРАХ ӨДРҮҮД**: Warn about Mercury Retrograde periods in 2026.
-      - **НЭГДСЭН ДҮГНЭЛТ**: Give a clear timeline for love.
+      - **ТҮЛХҮҮР 6: АЗ ХИЙМОРИЙН ТОМ МӨЧЛӨГ**: Analyze Jupiter's current transit relative to their Sun Sign {{zodiacSign}}.
+      - **ОНЦЛОХ ӨДРҮҮД**: Mention high-energy months in 2026.
+      - **ТҮЛХҮҮР 7: АНХААРАХ ӨДРҮҮД**: Warn about Mercury Retrograde in 2026 (Feb/Mar, Jun/Jul, Oct/Nov).
 
       **БҮЛЭГ 5: ЗӨВЛӨГӨӨ БА ТАРНИ**
-      - Provide 3 specific pieces of advice balancing their Fire/Water/Earth/Air energies.
-      - **ТАНЫ ХАЙРЫН ТАРНИ**: Write a specific affirmation.
+      - **IMPORTANT**: Recall the Venus and Mars signs from Chapter 1 and 2. Ensure advice matches those signs. Do NOT contradict Chapter 1.
+      - Provide 3 advice points balancing their elemental energies.
+      - **ТАНЫ ХАЙРЫН ТАРНИ**: A spiritual affirmation.
       `,
 
       // --- B. TIME KNOWN (Houses & Ascendant) ---
@@ -101,36 +103,35 @@ const CONFIG = {
 
       USER DATA:
       Name: {{name}} | DOB: {{dob}} | TIME: {{tob}} | Gender: {{gender}}
-      Ascendant: Calculate Ascendant based on {{tob}} and {{dob}}.
-      7th House (Descendant): Opposite of Ascendant.
-      12th House: Calculate based on Ascendant.
+
+      **INTERNAL INSTRUCTION**:
+      1. Calculate Ascendant (Rising Sign) based on {{tob}}.
+      2. Determine 7th House (Descendant) = Opposite of Ascendant.
+      3. Determine 12th House Sign.
+      4. Calculate Venus, Moon, Mars positions.
 
       **БҮЛЭГ 1: ЧИНИЙ ХАЙР ДУРЛАЛЫН КОД**
-      (Context: Precise calculation using Time).
       - **ТҮЛХҮҮР 1: ТАНЫ ХАЙРЫН ХЭЛЭМЖ (СУГАР ГАРАГ)**: Identify Venus sign. Explain love style.
       - **ТҮЛХҮҮР 2: ТАНЫ СЭТГЭЛ ЗҮРХНИЙ ХЭРЭГЦЭЭ (САР)**: Identify Moon sign. Explain emotional needs.
       - **ДҮГНЭЛТ**: Synthesis.
 
       **БҮЛЭГ 2: ЗАЯАНЫ ХАНИЙН ДҮР ТӨРХ**
-      (Context: Use 7th House (Descendant) and Mars).
-      - **ТҮЛХҮҮР 3: ТАНЫ ХАНИЙН ГЭР (7-Р ГЭР)**: Identify the Sign on the 7th House cusp. This is the MAIN indicator of the partner.
-      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign. Compare it with the 7th House.
-      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Describe look/job based on 7th House Ruler.
-      - **ДҮГНЭЛТ**: Partner Archetype.
+      - **ТҮЛХҮҮР 3: ТАНЫ ХАНИЙН ГЭР (7-Р ГЭР)**: Identify the Sign on the 7th House cusp. This is the MAIN partner indicator. Explain "Opposites Attract" logic.
+      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign.
+      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Describe look/job based on the 7th House Ruler's nature.
+      - **ДҮГНЭЛТ**: Partner Archetype (e.g., "The Gentle Protector").
 
       **БҮЛЭГ 3: УЧРАХ НӨХЦӨЛ БА ГАЗАР**
-      (Context: Look at the House position of the 7th House Ruler OR the Moon).
-      - **ТҮЛХҮҮР 6: АЛСЫН ЗАЙ БА НУУЦЛАГ ЕРТӨНЦ**: Determine which House the Ruler of the 7th House is in (e.g., if in 12th, say "Secret/Distant"; if in 6th, say "Work"). *If calculating ruler is too complex, default to analyzing the Moon's House placement.*
-      - **ТҮЛХҮҮР 7: АНХНЫ МЭДРЭМЖ**: Describe the karmic feeling based on the House placement.
-      - **ДҮГНЭЛТ**: Summary of the meeting context.
+      - **ТҮЛХҮҮР 6: АЛСЫН ЗАЙ БА НУУЦЛАГ ЕРТӨНЦ**: Analyze where the Ruler of the 7th House is located (or use 12th House/Moon placement if ruler calc is ambiguous). Mention specific settings (Foreign lands, Online, Work, etc).
+      - **ТҮЛХҮҮР 7: АНХНЫ МЭДРЭМЖ**: Describe the vibe (Deja-vu, instant spark, slow burn) based on the House.
 
       **БҮЛЭГ 4: ХУГАЦААНЫ ТААМАГЛАЛ**
-      (Context: Jupiter transit through the 7th House).
-      - **ТҮЛХҮҮР 8: АЗ ХИЙМОРИЙН ГАРАГИЙН НӨЛӨӨ**: Calculate when Jupiter enters their 7th House (or trines it).
+      - **ТҮЛХҮҮР 8: АЗ ХИЙМОРИЙН ГАРАГИЙН НӨЛӨӨ**: Analyze when Jupiter transits the 7th House or trines it in 2025-2026.
       - **ТҮЛХҮҮР 9: АНХААРАХ ӨДРҮҮД**: Mercury Retrograde warnings for 2026.
 
       **БҮЛЭГ 5: ЗӨВЛӨГӨӨ БА ТАРНИ**
-      - Provide 3 advice points balancing their Ascendant (Self) vs 7th House (Partner).
+      - **IMPORTANT**: Review Ascendant (Self) vs 7th House (Partner) dynamic calculated in Ch 2. Advice must focus on balancing these two.
+      - Provide 3 specific advice points.
       - **ТАНЫ ХАЙРЫН ТАРНИ**: Affirmation.
       `
     }
@@ -646,3 +647,4 @@ function sendManyChat(subscriberId, pdfUrl, name, token) {
   const json = JSON.parse(res.getContentText());
   if (json.status !== "success") throw new Error("ManyChat Error: " + JSON.stringify(json));
 }
+```
