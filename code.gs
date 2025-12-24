@@ -1,13 +1,13 @@
 /****************************************************************************************
  * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (FINANCIAL & WEALTH)
- * VERSION: v3.1 - Financial Master Template
+ * VERSION: v3.2 - Financial Master Template (With Explanations)
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v3.1-Financial",
+  VERSION: "v3.2-Financial-Explanations",
   PRODUCT_NAME: "Таны Санхүүгийн Код & Баяжих Зурхай",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
@@ -76,10 +76,22 @@ const CONFIG = {
       {{timeAnalysisInstructions}}
 
       **📖 БҮЛЭГ 2: ТООН ЭНЕРГИЙН МАТРИЦ (NUMEROLOGY)**
-      - **Хувь Тавилангийн Тоо {{destinyNumber}}:** Explain how this number shapes their main path to wealth. (Use calculated value: {{destinyNumber}}).
-      - **Сүнсний Тоо {{soulNumber}}:** Explain their inner emotional need for security or freedom. (Calculated: {{soulNumber}}).
-      - **Дотоод Хүслийн Тоо {{innerDesireNumber}}:** What do they secretly crave? (Calculated: {{innerDesireNumber}}).
-      - **Зорилгын Тоо {{goalNumber}}:** Their ultimate financial mission. (Calculated: {{goalNumber}}).
+
+      **1️⃣ ХУВЬ ТАВИЛАНГИЙН ТОО: {{destinyNumber}}**
+      *({{destinyCalc}})*
+      - Explain how this number shapes their main path to wealth. (Based on calculation: {{destinyNumber}}).
+
+      **2️⃣ СҮНСНИЙ ТОО: {{soulNumber}}**
+      *({{soulCalc}})*
+      - Explain their inner emotional need for security or freedom. (Based on calculation: {{soulNumber}}).
+
+      **3️⃣ ДОТООД ХҮСЛИЙН ТОО: {{innerDesireNumber}}**
+      *({{innerDesireCalc}})*
+      - What do they secretly crave financially? (Based on calculation: {{innerDesireNumber}}).
+
+      **4️⃣ ЗОРИЛГЫН ТОО: {{goalNumber}}**
+      *({{goalCalc}})*
+      - Their ultimate financial mission. (Based on calculation: {{goalNumber}}).
       
       (Write in deep, flowing paragraphs. NO BULLETS).
       `,
@@ -88,11 +100,15 @@ const CONFIG = {
       PART_2: `
       TASK: Write PART 2 (Chapters 3 & 4).
       CONTEXT: Building on their Numerology ({{destinyNumber}}), focus on psychology and career.
-      
+
       **📖 БҮЛЭГ 3: САНХҮҮГИЙН ЗАН ТӨЛӨВ & МӨНГӨНИЙ СЭТГЭЛ ЗҮЙ**
       - Analyze their "Money Mindset". Are they a Saver, Spender, Investor, or Giver?
-      - **Money Blocks:** Identify potential psychological barriers (e.g., fear of poverty, imposter syndrome) based on their profile.
-      - **Decision Making:** How do they make financial decisions? (Impulsive vs. Analytical).
+
+      **⚠️ АНХААР: ТАНЫ САНХҮҮГИЙН "ТҮГЖЭЭ"**
+      - Identify potential psychological barriers (e.g., fear of poverty, imposter syndrome) based on their profile.
+
+      **Шийдвэр Гаргалт:**
+      - How do they make financial decisions? (Impulsive vs. Analytical).
 
       **📖 БҮЛЭГ 4: ТОХИРОМЖТОЙ ЧИГЛЭЛ & АМЖИЛТТАЙ САЛБАРУУД**
       - Suggest specific career paths or business models suitable for a {{zodiacSign}} with Life Path {{destinyNumber}}.
@@ -109,15 +125,18 @@ const CONFIG = {
 
       **📖 БҮЛЭГ 5: ИРЭЭДҮЙН 3 ЖИЛИЙН САНХҮҮГИЙН УРСГАЛ**
       
-      **{{year1}} он (Хувийн жил {{py1}}):**
+      **📅 {{year1}} ОН (ХУВИЙН ЖИЛ {{py1}})**
+      *({{py1Calc}})*
       - Explain the energy of Personal Year {{py1}}. (e.g., Year 1 is new beginnings, Year 8 is harvest/money, Year 9 is completion).
       - Financial Advice for this specific year.
 
-      **{{year2}} он (Хувийн жил {{py2}}):**
+      **📅 {{year2}} ОН (ХУВИЙН ЖИЛ {{py2}})**
+      *({{py2Calc}})*
       - Explain the energy of Personal Year {{py2}}.
       - What to avoid this year?
 
-      **{{year3}} он (Хувийн жил {{py3}}):**
+      **📅 {{year3}} ОН (ХУВИЙН ЖИЛ {{py3}})**
+      *({{py3Calc}})*
       - Explain the energy of Personal Year {{py3}}.
       - Key opportunities.
 
@@ -125,7 +144,7 @@ const CONFIG = {
       - **Дотоод түлхүүр:** A mindset shift needed for wealth.
       - **Гаднах түлхүүр:** A practical action to take.
       - **Энергийн түлхүүр:** How to unblock their flow.
-      
+
       (Write in deep, flowing paragraphs. NO BULLETS. End with an empowering closing statement).
       `
     }
@@ -281,9 +300,9 @@ function parseAndCalculateProfile(rawInput) {
   // Forecast Years
   const now = new Date();
   const currentYear = now.getFullYear();
-  const personalYear1 = calculatePersonalYear(year, month, day, currentYear + 1); // 2026
-  const personalYear2 = calculatePersonalYear(year, month, day, currentYear + 2); // 2027
-  const personalYear3 = calculatePersonalYear(year, month, day, currentYear + 3); // 2028
+  const py1 = calculatePersonalYear(year, month, day, currentYear + 1); // 2026
+  const py2 = calculatePersonalYear(year, month, day, currentYear + 2); // 2027
+  const py3 = calculatePersonalYear(year, month, day, currentYear + 3); // 2028
 
   return {
     name: name,
@@ -299,15 +318,19 @@ function parseAndCalculateProfile(rawInput) {
     timeAnimal: timeAnimal,
     
     // Numerology
-    destinyNumber: numerology.destiny,
-    soulNumber: numerology.soul,
-    innerDesireNumber: numerology.innerDesire,
-    goalNumber: numerology.goal,
+    destinyNumber: numerology.destiny.val,
+    destinyCalc: numerology.destiny.path,
+    soulNumber: numerology.soul.val,
+    soulCalc: numerology.soul.path,
+    innerDesireNumber: numerology.innerDesire.val,
+    innerDesireCalc: numerology.innerDesire.path,
+    goalNumber: numerology.goal.val,
+    goalCalc: numerology.goal.path,
     
-    // Personal Years (Forecast)
-    py1: { year: currentYear + 1, number: personalYear1 },
-    py2: { year: currentYear + 2, number: personalYear2 },
-    py3: { year: currentYear + 3, number: personalYear3 },
+    // Forecast
+    py1: { year: currentYear + 1, number: py1.val, calc: py1.path },
+    py2: { year: currentYear + 2, number: py2.val, calc: py2.path },
+    py3: { year: currentYear + 3, number: py3.val, calc: py3.path },
     
     elementRelationship: elementRel
   };
@@ -407,7 +430,7 @@ function getTimeAnimal(timeStr) {
   return "Тодорхойгүй";
 }
 
-// --- NEW NUMEROLOGY ENGINE ---
+// --- NEW NUMEROLOGY ENGINE WITH EXPLANATION STRINGS ---
 function calculateNumerology(y, m, d) {
   function sumDigits(n) {
     return String(n).split('').reduce((a, b) => a + Number(b), 0);
@@ -419,26 +442,41 @@ function calculateNumerology(y, m, d) {
     return reduce(sumDigits(n));
   }
 
-  // 1. Destiny Number (Life Path): Sum of full DOB
-  // 1978.10.15 -> 1+9+7+8+1+0+1+5 = 32 -> 5
-  const destiny = reduce(sumDigits(y) + sumDigits(m) + sumDigits(d));
+  // Helper to format: "1+9+8+3+0+1+0+1 = 32 -> 5"
+  function getPath(label, rawSum, reduced) {
+    return `${label} = ${rawSum} → ${reduced}`;
+  }
 
-  // 2. Soul Number: Sum of Day only
-  // 15 -> 1+5 = 6
+  // 1. Destiny Number (Life Path)
+  // Logic: Sum all digits of DOB
+  const dobString = `${y}${m < 10 ? '0'+m : m}${d < 10 ? '0'+d : d}`;
+  const rawDestiny = dobString.split('').reduce((a, b) => a + Number(b), 0);
+  const destiny = reduce(rawDestiny);
+  const destinyPath = `Бодолт: ${y}.${m}.${d} → ${rawDestiny} → ${destiny}`;
+
+  // 2. Soul Number
+  // Logic: Sum of Day only
   const soul = reduce(d);
+  const soulPath = `Бодолт: Төрсөн өдөр ${d} → ${soul}`;
 
-  // 3. Inner Desire: Sum of Month + Day
-  // 10 + 15 -> (1+0) + (1+5) -> 1 + 6 = 7
-  // OR: 10 + 15 = 25 -> 7. Let's use standard reduction per part.
-  const mVal = reduce(m);
-  const dVal = reduce(d);
-  const innerDesire = reduce(mVal + dVal);
+  // 3. Inner Desire
+  // Logic: Sum of Month + Day
+  const rawInner = reduce(m) + reduce(d);
+  const innerDesire = reduce(rawInner);
+  const innerPath = `Бодолт: Сар (${m}) + Өдөр (${d}) = ${rawInner} → ${innerDesire}`;
 
-  // 4. Goal Number: Destiny + Soul
-  // 5 + 6 = 11 -> 2 (or 11 if master)
-  const goal = reduce(destiny + soul);
+  // 4. Goal Number
+  // Logic: Destiny + Soul
+  const rawGoal = destiny + soul;
+  const goal = reduce(rawGoal);
+  const goalPath = `Бодолт: Хувь тавилан (${destiny}) + Сүнс (${soul}) = ${rawGoal} → ${goal}`;
 
-  return { destiny, soul, innerDesire, goal };
+  return {
+    destiny: { val: destiny, path: destinyPath },
+    soul: { val: soul, path: soulPath },
+    innerDesire: { val: innerDesire, path: innerPath },
+    goal: { val: goal, path: goalPath }
+  };
 }
 
 function calculatePersonalYear(birthY, birthM, birthD, currentYear) {
@@ -449,18 +487,21 @@ function calculatePersonalYear(birthY, birthM, birthD, currentYear) {
     if (n < 10) return n;
     return reduce(sumDigits(n));
   }
+
   // Formula: Current Year + Birth Month + Birth Day
-  // 2026 + 10 + 15 -> 2051 -> 8
-  return reduce(currentYear + sumDigits(birthM) + sumDigits(birthD));
+  const rawSum = currentYear + sumDigits(birthM) + sumDigits(birthD);
+  const val = reduce(rawSum);
+  const path = `Бодолт: ${currentYear} + ${birthM} + ${birthD} = ${rawSum} → ${val}`;
+
+  return { val, path };
 }
 
-// (Kept for compatibility, though less used in Financial report)
+// (Kept for compatibility)
 function calculateTransits(birthIdx) {
-  return { gate1: "", gate2: "", gate3: "" }; // Placeholder as we use Personal Year now
+  return { gate1: "", gate2: "", gate3: "" };
 }
 
 function analyzeElementalConflict(yearEl, zodiacEl) {
-  // Simple check for generating content context
   return `${yearEl} vs ${zodiacEl}`;
 }
 
@@ -492,15 +533,15 @@ function generateFullReport(p, apiKey) {
     "{{gender}}": p.gender,
 
     // Numerology
-    "{{destinyNumber}}": p.destinyNumber,
-    "{{soulNumber}}": p.soulNumber,
-    "{{innerDesireNumber}}": p.innerDesireNumber,
-    "{{goalNumber}}": p.goalNumber,
+    "{{destinyNumber}}": p.destinyNumber, "{{destinyCalc}}": p.destinyCalc,
+    "{{soulNumber}}": p.soulNumber,       "{{soulCalc}}": p.soulCalc,
+    "{{innerDesireNumber}}": p.innerDesireNumber, "{{innerDesireCalc}}": p.innerDesireCalc,
+    "{{goalNumber}}": p.goalNumber,       "{{goalCalc}}": p.goalCalc,
 
     // Forecast
-    "{{year1}}": p.py1.year, "{{py1}}": p.py1.number,
-    "{{year2}}": p.py2.year, "{{py2}}": p.py2.number,
-    "{{year3}}": p.py3.year, "{{py3}}": p.py3.number,
+    "{{year1}}": p.py1.year, "{{py1}}": p.py1.number, "{{py1Calc}}": p.py1.calc,
+    "{{year2}}": p.py2.year, "{{py2}}": p.py2.number, "{{py2Calc}}": p.py2.calc,
+    "{{year3}}": p.py3.year, "{{py3}}": p.py3.number, "{{py3Calc}}": p.py3.calc,
 
     "{{timeInfoLine}}": timeInfoLine,
     "{{timeAnalysisInstructions}}": timeAnalysisInstructions
@@ -519,7 +560,6 @@ function generateFullReport(p, apiKey) {
     - Zodiac: ${p.zodiacSign} (${p.zodiacElement})
     - Destiny Number: ${p.destinyNumber}
     - Soul Number: ${p.soulNumber}
-    - Personal Year ${p.py1.year}: ${p.py1.number}
   `;
 
   // 3. Helper to replace placeholders
