@@ -1,13 +1,13 @@
 /****************************************************************************************
  * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (ZURHAI AI)
- * VERSION: v3.0 - Master Template (Configurable)
+ * VERSION: v3.2 - SOULMATE PRO (Dual Template System)
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v3.0-MasterTemplate",
+  VERSION: "v3.2-SoulmatePro",
   PRODUCT_NAME: "Таны Хувь Заяаны Код - Дэлгэрэнгүй Тайлан",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3,
@@ -37,91 +37,101 @@ const CONFIG = {
 
   AI_SETTINGS: {
     // 1. THE PERSONA
-    ROLE: "Professional Mongolian Astrologer & Psychologist.",
+    ROLE: "Professional Mongolian Astrologer & Psychologist specializing in Synastry (Relationship Astrology) and Karmic Astrology.",
 
     // 2. THE TONE OF VOICE
-    TONE: "Literary, poetic, deep, philosophical. Avoid robotic or dry translated phrases. Write like a wise mentor speaking to a soul.",
+    TONE: "Deep, empathetic, spiritual, and empowering. Use Mongolian cultural nuances but modern psychological terms. The tone should be like a wise mentor speaking to a close friend.",
 
-    // 3. CORE RULES (Apply to all chapters)
+    // 3. CORE RULES
     CORE_RULES: `
-    1. NO INTRODUCTIONS: Do not say "Hello", "I am Saruulbat", or "Here is your report". Start directly with the Chapter Title.
-    2. NO BULLET POINTS: Do not use '*' or '-' for lists. Use full paragraphs or bold subheaders. The text must look like a book, not a PowerPoint slide.
+    1. NO INTRODUCTIONS: Start directly with the Chapter Title.
+    2. NO BULLET POINTS: Use full paragraphs or bold subheaders.
     3. FORMATTING: Use **BOLD** for important subheadings. Separate paragraphs with empty lines.
-    4. LANGUAGE PRECISION: Do not use weak words like "Магадгүй" (Maybe). Instead use "Өндөр магадлалтай" (High probability), "Танд тохионо" (Will happen to you), "Одод ингэж зааж байна" (The stars indicate).
-    5. ADDRESSING: Always address the user as "Чи" (You) - intimate and direct. Use "Чиний" (Your), "Чамайг" (You - accusative), "Чамд" (to You) naturally. NEVER use "Та" (Formal).
-    6. UNKNOWN TIME LOGIC: If 'Birth Time' or 'Ascendant' is "Тодорхойгүй" or "Unknown", DO NOT generate specific predictions based on the hour. Instead, explicitly state that since the birth time is unknown, the 'Hidden Self/Ascendant' reading is general.
-    7. BOLD SAFETY: When using ** for bold titles, you MUST close them (e.g., **Title**). NEVER leave them open like (**Title...). This is critical.
+    4. LANGUAGE PRECISION: Use "Чи" (You). Avoid weak words.
+    5. PLANETARY CALCULATION: You are responsible for calculating the positions of Venus, Mars, Juno, and Moon based on the user's Birth Date. You must be accurate.
+    6. BOLD SAFETY: Always close bold tags (e.g., **Title**).
     `,
 
-    // 4. CHAPTER PROMPTS (Use {{variables}} to insert data)
+    // 4. CHAPTER PROMPTS (DUAL SYSTEM)
     PROMPTS: {
-      // --- PART 1: IDENTITY ---
-      PART_1: `
-      TASK: Write PART 1 (Chapters 1 & 2).
 
-      Start with a boxed summary of their astrological profile.
+      // --- A. TIME UNKNOWN (Numerology & General Planets) ---
+      TIME_UNKNOWN: `
+      TASK: Write the Full Report using the "TIME UNKNOWN" Template.
 
-      **✨ ТАНЫ ЗУРХАЙН ТҮЛХҮҮР ӨГӨГДЛҮҮД**
-      👤 **Нэр:** {{name}}
-      📅 **Төрсөн огноо:** {{dob}}
-      🐉 **Монгол жил:** {{yearElement}} {{yearAnimal}}
-      ✨ **Өрнийн орд:** {{zodiacElement}} махбодьтой {{zodiacSign}}
-      {{timeInfoLine}}
-      🔢 **Амьдралын тоо:** {{lifePath}}
+      USER DATA:
+      Name: {{name}} | DOB: {{dob}} | Gender: {{gender}}
+      Life Path Number: {{lifePath}} (Ensure you mention this is calculated from {{dob}})
 
-      **📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР**
-      - Analyze the mix of {{yearAnimal}} and {{zodiacSign}}. Use the concept "{{elementRelationship}}" but write it poetically (e.g., "Fire and Water dance in your soul...").
-      - Contrast their outer appearance (Mask) vs inner reality (Truth).
-      {{timeAnalysisInstructions}}
-      - Explain Life Path {{lifePath}} and Birth Day {{birthDayNum}}.
-        * IMPORTANT: Briefly explain HOW this number was calculated (summing digits of {{dob}}) to build trust. If it is a Master Number (11, 22, 33), explain why we didn't reduce it further. (Mention Karmic Debt if 13, 14, 16, 19).
+      **БҮЛЭГ 1: ЧИНИЙ ХАЙР ДУРЛАЛЫН КОД**
+      (Context: Calculate Venus and Moon positions for {{dob}}. Explain Love Language (Venus) and Emotional Needs (Moon)).
+      - **ТҮЛХҮҮР 1: ТАНЫ ХАЙРЫН ХЭЛЭМЖ (СУГАР ГАРАГ)**: Identify Venus sign. Explain how they flirt and love.
+      - **ТҮЛХҮҮР 2: ТАНЫ СЭТГЭЛ ЗҮРХНИЙ ХЭРЭГЦЭЭ (САР)**: Identify Moon sign. Explain their inner emotional needs.
+      - **ДҮГНЭЛТ**: Summarize their love code based on Venus/Moon mix.
 
-      **📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ**
-      - What is their "Love Language"? What do they crave?
-      - Their Shadow Side: Why do they fail? (e.g., Saviour Complex, too demanding).
-      - Compatibility: Who fits them? Who destroys them?
+      **БҮЛЭГ 2: ЗАЯАНЫ ХАНИЙН ДҮР ТӨРХ**
+      (Context: Use Juno and Mars positions).
+      - **ТҮЛХҮҮР 3: ГЭРЛЭЛТИЙН БУРХАН (ЮНО)**: Identify Juno sign. Describe the marriage partner's character.
+      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign. Describe the ideal protector/partner qualities.
+      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Synthesize Juno/Mars to describe partner's look and profession.
+      - **ДҮГНЭЛТ**: Summarize the partner's archetype (e.g., "The Gentle Healer").
 
-      (Write in deep, flowing paragraphs. NO BULLETS).
+      **БҮЛЭГ 3: УЧРАХ НӨХЦӨЛ БА ГАЗАР (ТООН ЗУРХАЙ)**
+      (Context: Since time is unknown, use Life Path Number {{lifePath}}).
+      - **ТАНЫ ХУВЬ ЗАЯАНЫ ТОО**: Explain the calculation of {{lifePath}}.
+      - **ТҮҮНТЭЙ ХААНА ТАНИЛЦАХ ВЭ?**: Based on Life Path {{lifePath}}, predict the location (e.g., spiritual places for 11, work for 8).
+      - **АНХНЫ УЧРАЛ ЯМАР БАЙХ ВЭ?**: Describe the feeling of the first meeting based on numerology.
+      - **ДҮГНЭЛТ**: A spiritual summary of their destiny.
+
+      **БҮЛЭГ 4: ХУГАЦААНЫ ТААМАГЛАЛ**
+      (Context: Use Jupiter Transits relative to their Sun Sign {{zodiacSign}}).
+      - **ТҮЛХҮҮР 6: АЗ ХИЙМОРИЙН ТОМ МӨЧЛӨГ**: Analyze Jupiter's movement for 2025-2026 relative to {{zodiacSign}}.
+      - **ОНЦЛОХ ӨДРҮҮД**: Mention specific months in 2026 where Venus or Jupiter aspects their Sun.
+      - **ТҮЛХҮҮР 7: АНХААРАХ ӨДРҮҮД**: Warn about Mercury Retrograde periods in 2026.
+      - **НЭГДСЭН ДҮГНЭЛТ**: Give a clear timeline for love.
+
+      **БҮЛЭГ 5: ЗӨВЛӨГӨӨ БА ТАРНИ**
+      - Provide 3 specific pieces of advice balancing their Fire/Water/Earth/Air energies.
+      - **ТАНЫ ХАЙРЫН ТАРНИ**: Write a specific affirmation.
       `,
 
-      // --- PART 2: PARTNER & TIMING ---
-      PART_2: `
-      TASK: Write PART 2 (Chapters 3 & 4).
-      CONTEXT: We already discussed their character ({{yearAnimal}}, {{zodiacSign}}). Now focus on their Future Partner and Timing.
+      // --- B. TIME KNOWN (Houses & Ascendant) ---
+      TIME_KNOWN: `
+      TASK: Write the Full Report using the "TIME KNOWN" Template.
 
-      **📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"**
-      - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles to separate the sections.
-      - TARGET: The partner must be MONGOLIAN (No blue eyes/blonde hair). Describe realistic Mongolian features.
-      - GENDER: Remember to describe the OPPOSITE gender of {{gender}}.
-      - Structure:
-        **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
-        **2. Зан чанар:** (Describe personality)
-        **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
+      USER DATA:
+      Name: {{name}} | DOB: {{dob}} | TIME: {{tob}} | Gender: {{gender}}
+      Ascendant: Calculate Ascendant based on {{tob}} and {{dob}}.
+      7th House (Descendant): Opposite of Ascendant.
+      12th House: Calculate based on Ascendant.
 
-      **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
-      - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
-        * 1-р Хаалга: {{transit1}}
-        * 2-р Хаалга: {{transit2}}
-        * 3-р Хаалга: {{transit3}}
-      - Explain WHY these years are significant (Trine, Jupiter Return, etc) based on the status provided.
-      - Provide advice for each period.
+      **БҮЛЭГ 1: ЧИНИЙ ХАЙР ДУРЛАЛЫН КОД**
+      (Context: Precise calculation using Time).
+      - **ТҮЛХҮҮР 1: ТАНЫ ХАЙРЫН ХЭЛЭМЖ (СУГАР ГАРАГ)**: Identify Venus sign. Explain love style.
+      - **ТҮЛХҮҮР 2: ТАНЫ СЭТГЭЛ ЗҮРХНИЙ ХЭРЭГЦЭЭ (САР)**: Identify Moon sign. Explain emotional needs.
+      - **ДҮГНЭЛТ**: Synthesis.
 
-      (Write in deep, flowing paragraphs. NO BULLETS).
-      `,
+      **БҮЛЭГ 2: ЗАЯАНЫ ХАНИЙН ДҮР ТӨРХ**
+      (Context: Use 7th House (Descendant) and Mars).
+      - **ТҮЛХҮҮР 3: ТАНЫ ХАНИЙН ГЭР (7-Р ГЭР)**: Identify the Sign on the 7th House cusp. This is the MAIN indicator of the partner.
+      - **ТҮЛХҮҮР 4: ТАНЫ МӨРӨӨДЛИЙН ЗАЛУУ (АНГАРАГ ГАРАГ)**: Identify Mars sign. Compare it with the 7th House.
+      - **ТҮЛХҮҮР 5: ГАДААД ТӨРХ БА НИЙГМИЙН БАЙР СУУРЬ**: Describe look/job based on 7th House Ruler.
+      - **ДҮГНЭЛТ**: Partner Archetype.
 
-      // --- PART 3: FORECAST ---
-      PART_3: `
-      TASK: Write PART 3 (Chapter 5 ONLY).
-      CONTEXT: The report continues from the Transits section.
-      IMPORTANT: Do NOT write Chapter 6, Rituals, Imago Effect, or Conclusion. These are already pre-written in the template. Just finish Chapter 5.
+      **БҮЛЭГ 3: УЧРАХ НӨХЦӨЛ БА ГАЗАР**
+      (Context: Look at the House position of the 7th House Ruler OR the Moon).
+      - **ТҮЛХҮҮР 6: АЛСЫН ЗАЙ БА НУУЦЛАГ ЕРТӨНЦ**: Determine which House the Ruler of the 7th House is in (e.g., if in 12th, say "Secret/Distant"; if in 6th, say "Work"). *If calculating ruler is too complex, default to analyzing the Moon's House placement.*
+      - **ТҮЛХҮҮР 7: АНХНЫ МЭДРЭМЖ**: Describe the karmic feeling based on the House placement.
+      - **ДҮГНЭЛТ**: Summary of the meeting context.
 
-      **📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ ({{forecastYear}} ОН - {{nextYearAnimal}} ЖИЛ)**
-      (Context: We are forecasting for {{forecastYear}}).
-      - How does the {{nextYearAnimal}} Year ({{forecastYear}}) affect a {{yearAnimal}}?
-      - General Outlook & Career/Money advice.
-      - Provide specific advice for maintaining balance in {{forecastYear}}.
+      **БҮЛЭГ 4: ХУГАЦААНЫ ТААМАГЛАЛ**
+      (Context: Jupiter transit through the 7th House).
+      - **ТҮЛХҮҮР 8: АЗ ХИЙМОРИЙН ГАРАГИЙН НӨЛӨӨ**: Calculate when Jupiter enters their 7th House (or trines it).
+      - **ТҮЛХҮҮР 9: АНХААРАХ ӨДРҮҮД**: Mercury Retrograde warnings for 2026.
 
-      (Write in deep, flowing paragraphs. NO BULLETS. STOP immediately after Chapter 5).
+      **БҮЛЭГ 5: ЗӨВЛӨГӨӨ БА ТАРНИ**
+      - Provide 3 advice points balancing their Ascendant (Self) vs 7th House (Partner).
+      - **ТАНЫ ХАЙРЫН ТАРНИ**: Affirmation.
       `
     }
   },
@@ -131,18 +141,32 @@ const CONFIG = {
   // ==================================================================================
   
   TSAGAAN_SAR: {
+    // 1940s
+    1945: "02-13", 1946: "02-02", 1947: "01-22", 1948: "02-10", 1949: "01-29",
+    // 1950s
+    1950: "02-17", 1951: "02-06", 1952: "01-27", 1953: "02-14", 1954: "02-03",
+    1955: "02-24", 1956: "02-12", 1957: "01-31", 1958: "02-18", 1959: "02-08",
+    // 1960s
     1960: "02-27", 1961: "02-15", 1962: "02-05", 1963: "02-25", 1964: "02-13",
     1965: "02-02", 1966: "02-21", 1967: "02-09", 1968: "01-30", 1969: "02-17",
+    // 1970s
     1970: "02-06", 1971: "02-27", 1972: "02-15", 1973: "02-06", 1974: "02-23",
     1975: "02-11", 1976: "01-31", 1977: "02-18", 1978: "02-07", 1979: "02-28",
+    // 1980s
     1980: "02-16", 1981: "02-05", 1982: "02-24", 1983: "02-13", 1984: "02-02",
     1985: "02-20", 1986: "02-09", 1987: "01-29", 1988: "02-17", 1989: "02-06",
+    // 1990s
     1990: "02-27", 1991: "02-15", 1992: "02-04", 1993: "02-23", 1994: "02-10",
     1995: "01-31", 1996: "02-19", 1997: "02-07", 1998: "02-28", 1999: "02-16",
+    // 2000s
     2000: "02-05", 2001: "02-24", 2002: "02-12", 2003: "02-01", 2004: "02-22",
     2005: "02-09", 2006: "01-29", 2007: "02-18", 2008: "02-07", 2009: "02-25",
+    // 2010s
     2010: "02-14", 2011: "02-03", 2012: "02-22", 2013: "02-11", 2014: "01-31",
-    2015: "02-19"
+    2015: "02-19", 2016: "02-09", 2017: "02-27", 2018: "02-16", 2019: "02-05",
+    // 2020s
+    2020: "02-24", 2021: "02-12", 2022: "02-02", 2023: "02-21", 2024: "02-10",
+    2025: "02-28"
   },
 
   ANIMALS: ["Хулгана", "Үхэр", "Бар", "Туулай", "Луу", "Могой", "Морь", "Хонь", "Бич", "Тахиа", "Нохой", "Гахай"],
@@ -443,19 +467,17 @@ function generateFullReport(p, apiKey) {
   const currentMonth = now.getMonth() + 1; 
   let forecastYear = currentYear;
   if (currentMonth >= 11) forecastYear = currentYear + 1;
-  const nextYearAnimal = CONFIG.ANIMALS[(forecastYear - 1900) % 12].toUpperCase(); // Make uppercase
+  const nextYearAnimal = CONFIG.ANIMALS[(forecastYear - 1900) % 12].toUpperCase();
   
   // 1. Prepare Replacement Variables
-  // We add logic for optional sections here
   const timeInfoLine = p.timeAnimal !== "Тодорхойгүй"
     ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)`
     : "";
 
   const timeAnalysisInstructions = p.timeAnimal !== "Тодорхойгүй"
     ? `- Analyze ${p.timeAnimal} birth hour influence on their hidden self.`
-    : "(User does not know birth time, so SILENTLY SKIP the birth hour section. Do NOT mention that the time is unknown. Just move to the next topic naturally.)";
+    : "(User does not know birth time, so SILENTLY SKIP the birth hour section.)";
 
-  // The map of {{variables}} to values
   const replacements = {
     "{{name}}": p.name,
     "{{dob}}": p.dob,
@@ -478,7 +500,7 @@ function generateFullReport(p, apiKey) {
     "{{timeAnalysisInstructions}}": timeAnalysisInstructions
   };
 
-  // 2. Build System Prompt (Role + Core Rules + User Profile)
+  // 2. Build System Prompt
   const systemPrompt = `
     ROLE: ${CONFIG.AI_SETTINGS.ROLE}
     TONE: ${CONFIG.AI_SETTINGS.TONE}
@@ -496,28 +518,39 @@ function generateFullReport(p, apiKey) {
     - Transits: ${p.transit2025} | ${p.transit2026}
   `;
 
-  // 3. Helper to replace placeholders
+  // 3. Select Template based on Time Knowledge
+  const isTimeKnown = p.timeAnimal !== "Тодорхойгүй";
+  const selectedTemplate = isTimeKnown ? CONFIG.AI_SETTINGS.PROMPTS.TIME_KNOWN : CONFIG.AI_SETTINGS.PROMPTS.TIME_UNKNOWN;
+
+  // 4. Fill Helper
   const fill = (template) => {
     let result = template;
     for (const [key, val] of Object.entries(replacements)) {
-      result = result.split(key).join(val); // Global replace
+      result = result.split(key).join(val);
     }
     return result;
   };
 
-  // 4. Execute Prompts
-  const prompt1 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1);
+  // 5. Execute Prompt (Single Full Call or Split)
+  // For this Pro version, we can do it in one big context or split.
+  // Let's split into 2 parts to ensure length and quality.
+
+  const filledTemplate = fill(selectedTemplate);
+
+  // We actually need to execute the filled template.
+  // Since the user provided the FULL text in one go, we can send it as one task,
+  // OR split it if it's too long. Given 8192 tokens, one shot is risky for detailed output.
+  // Let's split it by Chapters for safety.
+
+  const prompt1 = systemPrompt + "\n" + "TASK: Write Chapters 1, 2, and 3 based on this template:\n" + filledTemplate.split("**БҮЛЭГ 4:")[0];
   const r1 = callGemini(prompt1, apiKey);
 
-  const prompt2 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2);
+  const prompt2 = systemPrompt + "\n" + "TASK: Write Chapters 4 and 5 based on this template:\n" + "**БҮЛЭГ 4:" + filledTemplate.split("**БҮЛЭГ 4:")[1];
   const r2 = callGemini(prompt2, apiKey);
 
-  const prompt3 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3);
-  const r3 = callGemini(prompt3, apiKey);
-
   return {
-    text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text,
-    usage: r1.usage + r2.usage + r3.usage
+    text: r1.text + "\n\n" + r2.text,
+    usage: r1.usage + r2.usage
   };
 }
 
