@@ -97,6 +97,7 @@ const CONFIG = {
         **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
         **2. Зан чанар:** (Describe personality)
         **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
+        **4. Санхүүгийн чадавхи & Мөнгөний Орд:** (Analyze partner's wealth potential. Use the concept that the User controls the {{wealthElement}} element. Does the partner bring this element? Or do they support it? Explain the 'Financial Karma' between them.)
       
       **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
       - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
@@ -303,7 +304,8 @@ function parseAndCalculateProfile(rawInput) {
     transit2026: transits.gate2, 
     transit2027: transits.gate3, 
     
-    elementRelationship: elementRel
+    elementRelationship: elementRel,
+    wealthElement: calculateWealthElement(mongolData.element)
   };
 }
 
@@ -447,6 +449,17 @@ function analyzeElementalConflict(yearEl, zodiacEl) {
   return "Холимог Энерги";
 }
 
+function calculateWealthElement(userElement) {
+  const map = {
+    "Модон": "Шороон",
+    "Гал": "Төмөр",
+    "Шороон": "Усан",
+    "Төмөр": "Модон",
+    "Усан": "Гал"
+  };
+  return map[userElement] || "Тодорхойгүй";
+}
+
 // ==========================================
 // 2. GENERATION ENGINE (CONFIG DRIVEN)
 // ==========================================
@@ -489,7 +502,8 @@ function generateFullReport(p, apiKey) {
     "{{forecastYear}}": forecastYear,
     "{{nextYearAnimal}}": nextYearAnimal,
     "{{timeInfoLine}}": timeInfoLine,
-    "{{timeAnalysisInstructions}}": timeAnalysisInstructions
+    "{{timeAnalysisInstructions}}": timeAnalysisInstructions,
+    "{{wealthElement}}": p.wealthElement
   };
 
   // 2. Build System Prompt (Role + Core Rules + User Profile)
