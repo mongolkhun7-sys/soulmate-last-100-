@@ -97,7 +97,16 @@ const CONFIG = {
         **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
         **2. Зан чанар:** (Describe personality)
         **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
-        **4. Санхүүгийн чадавхи & Мөнгөний Орд:** (Analyze partner's wealth potential. Use the concept that the User controls the {{wealthElement}} element. Does the partner bring this element? Or do they support it? Explain the 'Financial Karma' between them.)
+        **4. ТАНЫ САНХҮҮГ ТЭТГЭХ 'МӨНГӨНИЙ ХҮН' (WEALTH ELEMENT):**
+           - Based on the user's element, their Wealth Element is **{{wealthElement}}**.
+           - Explain: "Та {{yearElement}} махбодьтой тул {{wealthElement}} махбодийн энергитэй хүн таны санхүүг тэтгэнэ."
+           - Identify WHO matches this element:
+             * Metal (Төмөр) Year: Ends in 0 or 1.
+             * Water (Усан) Year: Ends in 2 or 3.
+             * Wood (Модон) Year: Ends in 4 or 5.
+             * Fire (Гал) Year: Ends in 6 or 7.
+             * Earth (Шороон) Year: Ends in 8 or 9.
+           - Mention that partners with this element (by birth year) bring financial luck.
       
       **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
       - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
