@@ -1,24 +1,24 @@
 /****************************************************************************************
- * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (ZURHAI AI)
- * VERSION: v3.0 - Master Template (Configurable)
- * AUTHOR: Saruulbat System (Refactored by Jules)
+ * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (PHONE NUMBER EDITION)
+ * VERSION: v4.0 - Phone Numerology
+ * AUTHOR: Jules (Refactored for Phone Logic)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v3.0-MasterTemplate",
-  PRODUCT_NAME: "Таны Хувь Заяаны Код - Дэлгэрэнгүй Тайлан",
+  VERSION: "v4.0-PhoneNumerology",
+  PRODUCT_NAME: "Утасны Дугаарын Нууц Тайлал",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.8, 
+  TEMPERATURE: 0.7, // Slightly lower for more consistent numerology explanations
 
   // --- COLUMN MAPPING (0-based) ---
   COLUMNS: {
-    NAME: 0,      // A
+    NAME: 0,      // A (Not used in report, but kept for sheet structure)
     ID: 1,        // B
-    INPUT: 2,     // C
+    INPUT: 2,     // C (Raw input: "gender - date - phone")
     PDF: 3,       // D
     STATUS: 4,    // E
     TOKEN: 5,     // F
@@ -32,155 +32,127 @@ const CONFIG = {
   SAFETY_BUFFER: 60000,
 
   // ==================================================================================
-  // ⚙️ MASTER CONFIGURATION (EDIT HERE FOR NEW PRODUCTS)
+  // ⚙️ MASTER CONFIGURATION
   // ==================================================================================
   
   AI_SETTINGS: {
-    // 1. THE PERSONA
-    ROLE: "Professional Mongolian Astrologer & Psychologist.",
+    ROLE: "Master Numerologist & Astrologer specializing in Phone Number Energy and Mongolian Astrology.",
     
-    // 2. THE TONE OF VOICE
-    TONE: "Literary, poetic, deep, philosophical. Avoid robotic or dry translated phrases. Write like a wise mentor speaking to a soul.",
+    TONE: "Professional, mysterious, deeply explanatory, and respectful. Avoid flowery or overly sweet language. Use authoritative but kind mentorship tone.",
     
-    // 3. CORE RULES (Apply to all chapters)
     CORE_RULES: `
-    1. NO INTRODUCTIONS: Do not say "Hello", "I am Saruulbat", or "Here is your report". Start directly with the Chapter Title.
-    2. NO BULLET POINTS: Do not use '*' or '-' for lists. Use full paragraphs or bold subheaders. The text must look like a book, not a PowerPoint slide.
-    3. FORMATTING: Use **BOLD** for important subheadings. Separate paragraphs with empty lines.
-    4. LANGUAGE PRECISION: Do not use weak words like "Магадгүй" (Maybe). Instead use "Өндөр магадлалтай" (High probability), "Танд тохионо" (Will happen to you), "Одод ингэж зааж байна" (The stars indicate).
-    5. ADDRESSING: Always address the user as "Чи" (You) - intimate and direct. Use "Чиний" (Your), "Чамайг" (You - accusative), "Чамд" (to You) naturally. NEVER use "Та" (Formal).
-    6. UNKNOWN TIME LOGIC: If 'Birth Time' or 'Ascendant' is "Тодорхойгүй" or "Unknown", DO NOT generate specific predictions based on the hour. Instead, explicitly state that since the birth time is unknown, the 'Hidden Self/Ascendant' reading is general.
-    7. BOLD SAFETY: When using ** for bold titles, you MUST close them (e.g., **Title**). NEVER leave them open like (**Title...). This is critical.
+    1. EXPLAIN THE "WHY": Never just state a number. Always explain the calculation logic briefly in the flow of text (e.g., "Your number sums to 32, which reduces to 5...").
+    2. NO INTRODUCTIONS/OUTROS: Start directly with Chapter Titles. Do not say "Here is your report".
+    3. NO BULLET POINTS: Use full, flowing paragraphs.
+    4. MONGOLIAN CONTEXT: Use terms like 'Гаригийн нөлөө' (Planetary influence), 'Амь сүлд' (Life force), 'Энергийн урсгал' (Energy flow).
+    5. CONTEXT AWARENESS: You are writing a single cohesive book. Do not repeat yourself.
+    6. FORMATTING: Use **BOLD** for subheaders.
+    7. ADDRESSING: Use "Та" (You) respectfully or "Чи" (You) if the context implies a close mentorship, but given the request for "40+ audience", a respectful but direct "Та" or neutral voicing is safer. Let's stick to a direct, professional voice.
     `,
 
-    // 4. CHAPTER PROMPTS (Use {{variables}} to insert data)
     PROMPTS: {
-      // --- PART 1: IDENTITY ---
+      // --- PART 1: ROOT & WEALTH ---
       PART_1: `
-      TASK: Write PART 1 (Chapters 1 & 2).
-      
-      Start with a boxed summary of their astrological profile.
+      TASK: Write PART 1 (Summary + Chapters 1 & 2).
       
       **✨ ТАНЫ ЗУРХАЙН ТҮЛХҮҮР ӨГӨГДЛҮҮД**
-      👤 **Нэр:** {{name}}
       📅 **Төрсөн огноо:** {{dob}}
-      🐉 **Монгол жил:** {{yearElement}} {{yearAnimal}}
-      ✨ **Өрнийн орд:** {{zodiacElement}} махбодьтой {{zodiacSign}}
-      {{timeInfoLine}}
-      🔢 **Амьдралын тоо:** {{lifePath}}
+      👤 **Хүйс:** {{gender}}
+      📱 **Шинжилж буй дугаар:** {{phoneNumber}}
+      🐉 **Монгол жил:** {{yearAnimal}}
+      🔢 **Амьдралын тоо (Life Path):** {{lifePath}}
+      ⭐️ **Дугаарын Амь Сүлд (Root):** {{rootNumber}} ({{planetName}})
       
-      **📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР**
-      - Analyze the mix of {{yearAnimal}} and {{zodiacSign}}. Use the concept "{{elementRelationship}}" but write it poetically (e.g., "Fire and Water dance in your soul...").
-      - Contrast their outer appearance (Mask) vs inner reality (Truth).
-      {{timeAnalysisInstructions}}
-      - Explain Life Path {{lifePath}} and Birth Day {{birthDayNum}}.
-        * IMPORTANT: Briefly explain HOW this number was calculated (summing digits of {{dob}}) to build trust. If it is a Master Number (11, 22, 33), explain why we didn't reduce it further. (Mention Karmic Debt if 13, 14, 16, 19).
+      **📖 БҮЛЭГ 1: ТАНЫ ДУГААРЫН АМЬ СҮЛД БА ГАРИГИЙН НӨЛӨӨ**
+      - Explain the **Root Number {{rootNumber}}**. Mention it comes from summing the digits ({{rootCalculation}}).
+      - Identify the Ruling Planet: **{{planetName}}**.
+      - Describe the personality and energy of this number. Is it a leader (1), emotional (2), wealthy (8), etc?
+      - Connect it to the user: "As a {{yearAnimal}} born person, this energy affects you by..."
 
-      **📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ**
-      - What is their "Love Language"? What do they crave?
-      - Their Shadow Side: Why do they fail? (e.g., Saviour Complex, too demanding).
-      - Compatibility: Who fits them? Who destroys them?
-      
-      (Write in deep, flowing paragraphs. NO BULLETS).
+      **📖 БҮЛЭГ 2: ЭД БАЯЛГИЙН ХУРИМТЛАЛ БА ХИШИГ БУЯНЫ УРСГАЛ**
+      - **Wealth Codes:** Analyze the presence of the digits 8 (Big Wealth), 6 (Cash/Luxury), and 3 (Growth).
+      - **Logic:** {{wealthAnalysisLogic}} (Use this logic to explain the strength of the number).
+      - **Warning:** {{zeroWarning}} (If the number ends in 0, explain the "Empty Container" concept gently but firmly).
+      - Provide a financial conclusion for this number.
       `,
 
-      // --- PART 2: PARTNER & TIMING ---
+      // --- PART 2: HARMONY & RELATIONS ---
       PART_2: `
       TASK: Write PART 2 (Chapters 3 & 4).
-      CONTEXT: We already discussed their character ({{yearAnimal}}, {{zodiacSign}}). Now focus on their Future Partner and Timing.
+      CONTEXT: We have analyzed the number's energy. Now we check compatibility.
       
-      **📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"**
-      - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles to separate the sections.
-      - TARGET: The partner must be MONGOLIAN (No blue eyes/blonde hair). Describe realistic Mongolian features.
-      - GENDER: Remember to describe the OPPOSITE gender of {{gender}}.
-      - Structure:
-        **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
-        **2. Зан чанар:** (Describe personality)
-        **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
+      **📖 БҮЛЭГ 3: ХУВЬ ЗАЯА БА ДУГААРЫН ЗОХИЦОЛ**
+      - Compare **Life Path {{lifePath}}** and **Phone Root {{rootNumber}}**.
+      - **The Logic:** {{harmonyLogic}} (Explain that we are checking if both are Odd or both are Even).
+      - **Result:** {{harmonyVerdict}}
+      - Explain what this means for the user's daily life and success. Does the phone support them or challenge them?
       
-      **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
-      - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
-        * 1-р Хаалга: {{transit1}}
-        * 2-р Хаалга: {{transit2}}
-        * 3-р Хаалга: {{transit3}}
-      - Explain WHY these years are significant (Trine, Jupiter Return, etc) based on the status provided.
-      - Provide advice for each period.
-      
-      (Write in deep, flowing paragraphs. NO BULLETS).
+      **📖 БҮЛЭГ 4: ТАНЫГ ТЭТГЭХ ХҮМҮҮС БА ИВЭЭЛ ЖИЛҮҮД**
+      - Based on the user's Year: **{{yearAnimal}}**.
+      - Identify the **Trine Allies (Ивээл жилүүд):** {{trineAllies}}.
+      - Explain WHY these people are good for the user (Business partners, friends).
+      - Suggest that numbers containing 1 or 6 (Water/Metal elements) or numbers related to these allies are beneficial.
       `,
 
-      // --- PART 3: FORECAST ---
+      // --- PART 3: REMEDY ---
       PART_3: `
       TASK: Write PART 3 (Chapter 5 ONLY).
-      CONTEXT: The report continues from the Transits section.
-      IMPORTANT: Do NOT write Chapter 6, Rituals, Imago Effect, or Conclusion. These are already pre-written in the template. Just finish Chapter 5.
       
-      **📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ ({{forecastYear}} ОН - {{nextYearAnimal}} ЖИЛ)**
-      (Context: We are forecasting for {{forecastYear}}).
-      - How does the {{nextYearAnimal}} Year ({{forecastYear}}) affect a {{yearAnimal}}? 
-      - General Outlook & Career/Money advice.
-      - Provide specific advice for maintaining balance in {{forecastYear}}.
+      **📖 БҮЛЭГ 5: ЗАСАЛ, ХАРИУЛГА БА ЭНЕРГИЙН ТҮЛХҮҮР**
+      - Provide advice based on **Gender: {{gender}}** and **Root Number: {{rootNumber}}**.
+      - **Color Therapy:** Suggest colors that balance the {{planetName}} energy.
+      - **Behavioral Remedy:** What habits should they adopt? (e.g., If Root 9, control anger. If Root 6, enjoy art).
+      - **Mantra/Affirmation:** Give a short Mongolian affirmation statement for success.
       
-      (Write in deep, flowing paragraphs. NO BULLETS. STOP immediately after Chapter 5).
+      (End with a short, wise closing sentence. DO NOT write "Conclusion" as a header).
       `
     }
   },
 
- // ==================================================================================
-  // 🧠 STATIC DATA (DO NOT EDIT BELOW THIS LINE)
-  // ==================================================================================
+  // --- STATIC DATA ---
   
+  // 1940-2025 Tsagaan Sar Map
   TSAGAAN_SAR: {
-    // 1940s
     1945: "02-13", 1946: "02-02", 1947: "01-22", 1948: "02-10", 1949: "01-29",
-    // 1950s
     1950: "02-17", 1951: "02-06", 1952: "01-27", 1953: "02-14", 1954: "02-03",
     1955: "02-24", 1956: "02-12", 1957: "01-31", 1958: "02-18", 1959: "02-08",
-    // 1960s
     1960: "02-27", 1961: "02-15", 1962: "02-05", 1963: "02-25", 1964: "02-13",
     1965: "02-02", 1966: "02-21", 1967: "02-09", 1968: "01-30", 1969: "02-17",
-    // 1970s
     1970: "02-06", 1971: "02-27", 1972: "02-15", 1973: "02-06", 1974: "02-23",
     1975: "02-11", 1976: "01-31", 1977: "02-18", 1978: "02-07", 1979: "02-28",
-    // 1980s
     1980: "02-16", 1981: "02-05", 1982: "02-24", 1983: "02-13", 1984: "02-02",
     1985: "02-20", 1986: "02-09", 1987: "01-29", 1988: "02-17", 1989: "02-06",
-    // 1990s
     1990: "02-27", 1991: "02-15", 1992: "02-04", 1993: "02-23", 1994: "02-10",
     1995: "01-31", 1996: "02-19", 1997: "02-07", 1998: "02-28", 1999: "02-16",
-    // 2000s
     2000: "02-05", 2001: "02-24", 2002: "02-12", 2003: "02-01", 2004: "02-22",
     2005: "02-09", 2006: "01-29", 2007: "02-18", 2008: "02-07", 2009: "02-25",
-    // 2010s
     2010: "02-14", 2011: "02-03", 2012: "02-22", 2013: "02-11", 2014: "01-31",
     2015: "02-19", 2016: "02-09", 2017: "02-27", 2018: "02-16", 2019: "02-05",
-    // 2020s
     2020: "02-24", 2021: "02-12", 2022: "02-02", 2023: "02-21", 2024: "02-10",
-    2025: "02-28" // Note: 2025 Tsagaan Sar might vary slightly (Feb 28 or Mar 1) depending on source, but Feb 28 is safe.
+    2025: "02-28"
   },
 
   ANIMALS: ["Хулгана", "Үхэр", "Бар", "Туулай", "Луу", "Могой", "Морь", "Хонь", "Бич", "Тахиа", "Нохой", "Гахай"],
   
-  ELEMENTS_BY_LAST_DIGIT: {
-    0: "Төмөр", 1: "Төмөр", 2: "Усан", 3: "Усан", 4: "Модон", 5: "Модон", 6: "Гал", 7: "Гал", 8: "Шороон", 9: "Шороон"
+  PLANET_MEANINGS: {
+    1: "Наран (Sun) - Удирдагч, Эхлэл",
+    2: "Сар (Moon) - Зөөлөн, Харилцаа",
+    3: "Бархасбадь (Jupiter) - Өсөлт, Аз хийморь",
+    4: "Раху (Rahu) - Тогтвортой, Хөдөлмөрч",
+    5: "Буд (Mercury) - Худалдаа, Хурд",
+    6: "Сугар (Venus) - Тансаглал, Хайр дурлал",
+    7: "Кету (Ketu) - Сүнслэг, Дотогшоо",
+    8: "Санчир (Saturn) - Карма, Их мөнгө, Эрх мэдэл",
+    9: "Ангараг (Mars) - Тэмцэгч, Гал цог"
   },
 
-  ZODIACS: [
-    { name: "Матар", element: "Газар", start: "12-22", end: "01-19" },
-    { name: "Хумх", element: "Агаар", start: "01-20", end: "02-18" },
-    { name: "Загас", element: "Ус", start: "02-19", end: "03-20" },
-    { name: "Хонь", element: "Гал", start: "03-21", end: "04-19" },
-    { name: "Үхэр", element: "Газар", start: "04-20", end: "05-20" },
-    { name: "Ихэр", element: "Агаар", start: "05-21", end: "06-20" },
-    { name: "Мэлхий", element: "Ус", start: "06-21", end: "07-22" },
-    { name: "Арслан", element: "Гал", start: "07-23", end: "08-22" },
-    { name: "Охин", element: "Газар", start: "08-23", end: "09-22" },
-    { name: "Жинлүүр", element: "Агаар", start: "09-23", end: "10-22" },
-    { name: "Хилэнц", element: "Ус", start: "10-23", end: "11-21" },
-    { name: "Нум", element: "Гал", start: "11-22", end: "12-21" }
-  ],
+  TRINE_ALLIES: {
+    "Хулгана": "Луу, Бич", "Үхэр": "Могой, Тахиа", "Бар": "Морь, Нохой", "Туулай": "Гахай, Хонь",
+    "Луу": "Хулгана, Бич", "Могой": "Үхэр, Тахиа", "Морь": "Бар, Нохой", "Хонь": "Туулай, Гахай",
+    "Бич": "Хулгана, Луу", "Тахиа": "Үхэр, Могой", "Нохой": "Бар, Морь", "Гахай": "Туулай, Хонь"
+  },
 
-  DELIVERY_MESSAGE: `🔮 Сайн байна уу, {{NAME}}? \n\nЧиний "Хувь Заяаны Код" тайлагдлаа. Энэ бол зүгээр нэг зурхай биш, чиний дотоод ертөнцийн газрын зураг юм.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай, линк 7 хоногийн дараа устаж магадгүй)`,
+  DELIVERY_MESSAGE: `🔮 Сайн байна уу? \n\nТаны "Утасны Дугаарын Нууц Тайлал" бэлэн боллоо.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай, линк 7 хоногийн дараа устаж магадгүй)`,
 };
 
 // --- MAIN FUNCTION ---
@@ -222,17 +194,17 @@ function main() {
         const inputString = String(row[CONFIG.COLUMNS.INPUT]); 
         const contactId = row[CONFIG.COLUMNS.ID];
         
-        // 1. PARSE
+        // 1. PARSE & CALCULATE
         const profile = parseAndCalculateProfile(inputString);
         
         // 2. GENERATE
         const reportResult = generateFullReport(profile, KEYS.GEMINI);
         
         // 3. CREATE PDF
-        const pdfUrl = createPdf(profile.name, reportResult.text, KEYS.TEMPLATE);
+        const pdfUrl = createPdf(profile.name || "User", reportResult.text, KEYS.TEMPLATE);
 
         // 4. SEND
-        sendManyChat(contactId, pdfUrl, profile.firstName, KEYS.MANYCHAT);
+        sendManyChat(contactId, pdfUrl, profile.name || "Erhem", KEYS.MANYCHAT);
 
         // 5. LOG
         const now = new Date();
@@ -262,63 +234,73 @@ function main() {
 }
 
 // ==========================================
-// 1. CORE LOGIC ENGINE
+// 1. CORE LOGIC ENGINE (PHONE NUMEROLOGY)
 // ==========================================
 
 function parseAndCalculateProfile(rawInput) {
+  // 1. Normalize Input (Fix typos, extract DOB, Phone, Gender)
   const normalized = normalizeInputWithAI(rawInput, CONFIG.GEMINI_MODEL, PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"));
   
   const dateStr = normalized.date; 
-  const timeStr = normalized.time; 
   const gender = normalized.gender; 
-  const name = normalized.name;
+  const phoneNumber = normalized.phone.replace(/\D/g, ""); // Remove non-digits
 
+  if (!dateStr || !phoneNumber) throw new Error("Invalid Input: Missing Date or Phone");
+
+  // 2. Parse Date
   const [year, month, day] = dateStr.split(".").map(Number);
   
+  // 3. Core Calculations
   const mongolData = getMongolianYearData(year, month, day);
-  const zodiacData = getWesternZodiac(month, day);
-  const timeAnimal = getTimeAnimal(timeStr);
-  const numerology = calculateNumerology(year, month, day);
-  const transits = calculateTransits(mongolData.animalIndex);
-  const elementRel = analyzeElementalConflict(mongolData.element, zodiacData.element);
+  const rootInfo = calculateRootNumber(phoneNumber);
+  const wealthInfo = analyzeWealth(phoneNumber);
+  const lifePath = calculateLifePath(year, month, day);
+  const harmony = checkHarmony(lifePath, rootInfo.number);
+  const trines = CONFIG.TRINE_ALLIES[mongolData.animal] || "Тодорхойгүй";
 
   return {
-    name: name,
-    firstName: name.split(" ")[0],
     dob: dateStr,
-    tob: timeStr,
     gender: gender,
+    phoneNumber: phoneNumber,
     
+    // Mongolian Year
     yearAnimal: mongolData.animal,
-    yearElement: mongolData.element,
-    zodiacSign: zodiacData.name,
-    zodiacElement: zodiacData.element,
-    timeAnimal: timeAnimal,
-    isDoubleAnimal: mongolData.animal === timeAnimal,
     
-    lifePath: numerology.lifePath,
-    birthDayNum: numerology.birthDay,
+    // Numerology
+    rootNumber: rootInfo.number,
+    planetName: CONFIG.PLANET_MEANINGS[rootInfo.number],
+    rootCalculation: rootInfo.calculation, // e.g., "9+9+1+1... = 32 -> 5"
+
+    // Wealth
+    wealthAnalysisLogic: wealthInfo.logic, // Text explaining counts of 8, 6, 3
+    zeroWarning: wealthInfo.warning,       // Text if ends with 0
     
-    transit2025: transits.gate1, 
-    transit2026: transits.gate2, 
-    transit2027: transits.gate3, 
+    // Harmony
+    lifePath: lifePath,
+    harmonyLogic: harmony.logic,
+    harmonyVerdict: harmony.verdict,
     
-    elementRelationship: elementRel
+    // Trines
+    trineAllies: trines
   };
 }
 
 function normalizeInputWithAI(raw, model, key) {
   const prompt = `
-    TASK: Normalize this input string into JSON.
+    TASK: Clean and Extract data.
     INPUT: "${raw}"
-    REQUIRED JSON FORMAT:
+    INSTRUCTION:
+    1. Fix typos in Year (e.g., 19995 -> 1995, 20202 -> 2020).
+    2. Extract Gender (Эрэгтэй/Эмэгтэй).
+    3. Extract Phone Number (Remove dashes/spaces).
+    4. Format Date as YYYY.MM.DD.
+
+    RETURN JSON:
     {
-      "name": "Full Name",
-      "date": "YYYY.MM.DD", 
-      "time": "HH:MM" OR "Unknown",
-      "gender": "Эрэгтэй" or "Эмэгтэй"
+      "date": "YYYY.MM.DD",
+      "gender": "Эрэгтэй" or "Эмэгтэй",
+      "phone": "DigitsOnly"
     }
-    RETURN ONLY JSON.
   `;
   try {
     const result = callGemini(prompt, key); 
@@ -326,22 +308,94 @@ function normalizeInputWithAI(raw, model, key) {
     return JSON.parse(cleanJson);
   } catch (e) {
     console.error("Normalization Failed", e);
+    // Fallback parser if AI fails
     const parts = raw.split("-");
     return {
-      name: parts[0] ? parts[0].trim() : "Unknown",
       date: parts[1] ? parts[1].trim() : "2000.01.01",
-      time: parts[2] ? parts[2].trim() : "Unknown",
-      gender: parts[3] ? parts[3].trim() : "Эмэгтэй"
+      gender: "Эмэгтэй",
+      phone: parts[2] ? parts[2].replace(/\D/g, "") : "0000"
     };
   }
 }
 
+// --- MATH HELPERS ---
+
+function calculateRootNumber(phoneStr) {
+  const digits = phoneStr.split("").map(Number);
+  const sum1 = digits.reduce((a, b) => a + b, 0);
+  
+  let finalSum = sum1;
+  while (finalSum > 9) {
+    finalSum = String(finalSum).split("").map(Number).reduce((a, b) => a + b, 0);
+  }
+
+  // Format calculation string for transparency: "9+9...=30 -> 3"
+  const calcStr = `(${digits.join("+")} = ${sum1} -> ${finalSum})`;
+
+  return { number: finalSum, calculation: calcStr };
+}
+
+function analyzeWealth(phoneStr) {
+  const count8 = (phoneStr.match(/8/g) || []).length;
+  const count6 = (phoneStr.match(/6/g) || []).length;
+  const count3 = (phoneStr.match(/3/g) || []).length;
+  
+  let logic = `Энэ дугаарт 8-ын тоо ${count8} удаа, 6-гийн тоо ${count6} удаа, 3-ын тоо ${count3} удаа орсон байна. `;
+
+  if (count8 >= 2) logic += "8-ын тоо олон байгаа нь баялгийн маш хүчтэй соронзон орон үүсгэнэ. ";
+  if (count6 >= 2) logic += "6-гийн тоо нь бэлэн мөнгөний урсгал болон тансаг хэрэглээг дууддаг. ";
+  if (count3 >= 2) logic += "3-ын тоо нь өсөлт дэвшил, үржлийг бэлгэддэг. ";
+  if (count8 === 0 && count6 === 0) logic += "Баялгийн шууд тоонууд цөөн тул бусад энергийн дэмжлэг хэрэгтэй. ";
+
+  let warning = "";
+  if (phoneStr.endsWith("0")) {
+    warning = "Анхаар: Таны дугаар 0-ээр төгссөн байна. Энэ нь 'Савны ёроол цоорхой' мэт нөлөөтэй тул олсон мөнгө тогтохгүй урсах эрсдэлтэй. Засал: Сав дүүргэх бэлгэдэл хэрэглэх.";
+  } else {
+    warning = "Дугаарын төгсгөл 0 биш байгаа нь сайн хэрэг. Урсгал битүүмжлэгдсэн байна.";
+  }
+  
+  return { logic, warning };
+}
+
+function calculateLifePath(y, m, d) {
+  function sumDigits(n) {
+    return String(n).split('').reduce((a, b) => a + Number(b), 0);
+  }
+  
+  // Standard Life Path: Reduce Year, Month, Day separately, then sum, then reduce.
+  // Actually, user said: "Төрсөн он, сар, өдрийн бүх цифрийг нэмж 1 оронтой тоо гаргана."
+  // Simple method: Sum everything -> Reduce
+
+  let total = sumDigits(y) + sumDigits(m) + sumDigits(d);
+  while (total > 9) {
+    total = sumDigits(total);
+  }
+  return total;
+}
+
+function checkHarmony(lifePath, root) {
+  const lpEven = lifePath % 2 === 0;
+  const rootEven = root % 2 === 0;
+  
+  let verdict = "";
+  let logic = `Таны Амьдралын тоо ${lifePath} (${lpEven ? "Тэгш" : "Сондгой"}), Дугаарын тоо ${root} (${rootEven ? "Тэгш" : "Сондгой"}). `;
+  
+  if (lpEven === rootEven) {
+    verdict = "ТӨГС ЗОХИЦОЛ (Perfect Harmony). Хоёулаа ижил хэмнэлтэй (Тэгш/Тэгш эсвэл Сондгой/Сондгой) тул энерги нь бие биенээ дэмжинэ.";
+  } else {
+    verdict = "ТЭНЦВЭРЖҮҮЛЭХ ШААРДЛАГАТАЙ (Balancing Needed). Нэг нь Тэгш, нөгөө нь Сондгой тул дотоод зөрчил үүсгэж мэднэ.";
+  }
+
+  return { logic, verdict };
+}
+
 function getMongolianYearData(year, month, day) {
   const tsDate = CONFIG.TSAGAAN_SAR[year];
-  if (!tsDate) throw new Error(`Year ${year} not in Tsagaan Sar Map`);
-  
+  // Simple fallback if year not in map
+  if (!tsDate) return { animal: "Тодорхойгүй", element: "" };
+
   const [tsMonth, tsDay] = tsDate.split("-").map(Number);
-  
+
   let trueYear = year;
   if (month < tsMonth || (month === tsMonth && day < tsDay)) {
     trueYear = year - 1;
@@ -349,185 +403,55 @@ function getMongolianYearData(year, month, day) {
 
   const animalIndex = (trueYear - 1900) % 12;
   const animal = CONFIG.ANIMALS[animalIndex];
-  const lastDigit = trueYear % 10;
-  const element = CONFIG.ELEMENTS_BY_LAST_DIGIT[lastDigit];
 
-  return { animal, element, animalIndex, trueYear };
-}
-
-function getWesternZodiac(m, d) {
-  const dateNum = m * 100 + d; 
-  
-  for (let z of CONFIG.ZODIACS) {
-    const [startM, startD] = z.start.split("-").map(Number);
-    const [endM, endD] = z.end.split("-").map(Number);
-    
-    if (z.name === "Матар") {
-      if (dateNum >= 1222 || dateNum <= 119) return z;
-    } else {
-      const start = startM * 100 + startD;
-      const end = endM * 100 + endD;
-      if (dateNum >= start && dateNum <= end) return z;
-    }
-  }
-  return { name: "Тодорхойгүй", element: "Тодорхойгүй" };
-}
-
-function getTimeAnimal(timeStr) {
-  if (!timeStr || timeStr.toLowerCase().includes("unknown") || timeStr === "Тодорхойгүй") return "Тодорхойгүй";
-  const hour = parseInt(timeStr.split(":")[0], 10);
-  
-  if (hour >= 23 || hour < 1) return "Хулгана";
-  if (hour >= 1 && hour < 3) return "Үхэр";
-  if (hour >= 3 && hour < 5) return "Бар";
-  if (hour >= 5 && hour < 7) return "Туулай";
-  if (hour >= 7 && hour < 9) return "Луу";
-  if (hour >= 9 && hour < 11) return "Могой";
-  if (hour >= 11 && hour < 13) return "Морь";
-  if (hour >= 13 && hour < 15) return "Хонь";
-  if (hour >= 15 && hour < 17) return "Бич";
-  if (hour >= 17 && hour < 19) return "Тахиа";
-  if (hour >= 19 && hour < 21) return "Нохой";
-  if (hour >= 21 && hour < 23) return "Гахай";
-  return "Тодорхойгүй";
-}
-
-function calculateNumerology(y, m, d) {
-  function sumDigits(n) {
-    return String(n).split('').reduce((a, b) => a + Number(b), 0);
-  }
-  
-  function reduceToMaster(n) {
-    if (n === 11 || n === 22 || n === 33) return n;
-    if (n < 10) return n;
-    return reduceToMaster(sumDigits(n));
-  }
-  const total = sumDigits(y) + sumDigits(m) + sumDigits(d);
-  const lifePath = reduceToMaster(total); 
-  const birthDay = d; 
-  return { lifePath, birthDay };
-}
-
-function calculateTransits(birthIdx) {
-  const startYear = 2026;
-  const startAnimalIdx = 6; // Horse
-  
-  let gates = [];
-  
-  for (let i = 0; i < 12; i++) {
-    let currentYear = startYear + i;
-    let currentAnimalIdx = (startAnimalIdx + i) % 12;
-    let animalName = CONFIG.ANIMALS[currentAnimalIdx];
-    let diff = (currentAnimalIdx - birthIdx + 12) % 12;
-    let status = "";
-    let isGolden = false;
-
-    if (diff === 0) { status = "Өөрийн жил (Jupiter Return)"; isGolden = true; }
-    else if (diff === 4 || diff === 8) { status = "Их Ивээл (Алтан Хаалга)"; isGolden = true; }
-    else if (diff === 6) { status = "Харш (Сорилт)"; } 
-    else if (diff === 3) { status = "Түнш (Ивээл)"; isGolden = true; } 
-    
-    if (isGolden || i === 0) { 
-       gates.push({ year: currentYear, animal: animalName, status: status || "Хэвийн (Бэлтгэл үе)" });
-    }
-  }
-
-  return {
-    gate1: gates[0] ? `${gates[0].year} (${gates[0].animal}) - ${gates[0].status}` : "2026 (Морь) - Хэвийн",
-    gate2: gates[1] ? `${gates[1].year} (${gates[1].animal}) - ${gates[1].status}` : "2027 (Хонь) - Хэвийн",
-    gate3: gates[2] ? `${gates[2].year} (${gates[2].animal}) - ${gates[2].status}` : "2028 (Бич) - Хэвийн"
-  };
-}
-
-function analyzeElementalConflict(yearEl, zodiacEl) {
-  if (yearEl === "Усан" && zodiacEl === "Гал") return "Ус Гал хоёрын тэмцэл (Буцалж буй Ус)";
-  if (yearEl === "Гал" && zodiacEl === "Ус") return "Гал Ус хоёрын тэмцэл (Унтарсан Цог)";
-  if (yearEl === zodiacEl) return "Давхар хүч (Тэнцвэртэй)";
-  if ((yearEl === "Модон" && zodiacEl === "Гал") || (yearEl === "Гал" && zodiacEl === "Модон")) return "Гал дээр тос (Дүрэлзсэн Энерги)";
-  return "Холимог Энерги";
+  return { animal, animalIndex };
 }
 
 // ==========================================
-// 2. GENERATION ENGINE (CONFIG DRIVEN)
+// 2. GENERATION & UTIL
 // ==========================================
 
 function generateFullReport(p, apiKey) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; 
-  let forecastYear = currentYear;
-  if (currentMonth >= 11) forecastYear = currentYear + 1; 
-  const nextYearAnimal = CONFIG.ANIMALS[(forecastYear - 1900) % 12].toUpperCase(); // Make uppercase
-  
-  // 1. Prepare Replacement Variables
-  // We add logic for optional sections here
-  const timeInfoLine = p.timeAnimal !== "Тодорхойгүй" 
-    ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)` 
-    : "";
-    
-  const timeAnalysisInstructions = p.timeAnimal !== "Тодорхойгүй"
-    ? `- Analyze ${p.timeAnimal} birth hour influence on their hidden self.`
-    : "(User does not know birth time, so SILENTLY SKIP the birth hour section. Do NOT mention that the time is unknown. Just move to the next topic naturally.)";
-
-  // The map of {{variables}} to values
+  // 1. Fill Placeholders
   const replacements = {
-    "{{name}}": p.name,
     "{{dob}}": p.dob,
-    "{{yearElement}}": p.yearElement,
-    "{{yearAnimal}}": p.yearAnimal,
-    "{{zodiacElement}}": p.zodiacElement,
-    "{{zodiacSign}}": p.zodiacSign,
-    "{{tob}}": p.tob,
-    "{{timeAnimal}}": p.timeAnimal,
-    "{{lifePath}}": p.lifePath,
-    "{{birthDayNum}}": p.birthDayNum,
-    "{{elementRelationship}}": p.elementRelationship,
     "{{gender}}": p.gender,
-    "{{transit1}}": p.transit2025,
-    "{{transit2}}": p.transit2026,
-    "{{transit3}}": p.transit2027,
-    "{{forecastYear}}": forecastYear,
-    "{{nextYearAnimal}}": nextYearAnimal,
-    "{{timeInfoLine}}": timeInfoLine,
-    "{{timeAnalysisInstructions}}": timeAnalysisInstructions
+    "{{phoneNumber}}": p.phoneNumber,
+    "{{yearAnimal}}": p.yearAnimal,
+    "{{lifePath}}": p.lifePath,
+    "{{rootNumber}}": p.rootNumber,
+    "{{planetName}}": p.planetName,
+    "{{rootCalculation}}": p.rootCalculation,
+    "{{wealthAnalysisLogic}}": p.wealthAnalysisLogic,
+    "{{zeroWarning}}": p.zeroWarning,
+    "{{harmonyLogic}}": p.harmonyLogic,
+    "{{harmonyVerdict}}": p.harmonyVerdict,
+    "{{trineAllies}}": p.trineAllies
   };
 
-  // 2. Build System Prompt (Role + Core Rules + User Profile)
-  const systemPrompt = `
-    ROLE: ${CONFIG.AI_SETTINGS.ROLE}
-    TONE: ${CONFIG.AI_SETTINGS.TONE}
-    
-    CORE RULES:
-    ${CONFIG.AI_SETTINGS.CORE_RULES}
-    
-    USER PROFILE:
-    - Name: ${p.name}
-    - Gender: ${p.gender}
-    - Year: ${p.yearElement} ${p.yearAnimal}
-    - Zodiac: ${p.zodiacSign} (${p.zodiacElement})
-    - Birth Time: ${p.tob} (${p.timeAnimal})
-    - Life Path: ${p.lifePath}
-    - Transits: ${p.transit2025} | ${p.transit2026}
-  `;
-
-  // 3. Helper to replace placeholders
   const fill = (template) => {
     let result = template;
     for (const [key, val] of Object.entries(replacements)) {
-      result = result.split(key).join(val); // Global replace
+      result = result.split(key).join(val);
     }
     return result;
   };
 
-  // 4. Execute Prompts
-  const prompt1 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1);
-  const r1 = callGemini(prompt1, apiKey);
+  // 2. Construct System Prompt
+  const systemPrompt = `
+    ROLE: ${CONFIG.AI_SETTINGS.ROLE}
+    TONE: ${CONFIG.AI_SETTINGS.TONE}
+    CORE RULES: ${CONFIG.AI_SETTINGS.CORE_RULES}
+    USER DATA:
+    - Gender: ${p.gender}
+    - Year: ${p.yearAnimal}
+    - Phone Root: ${p.rootNumber} (${p.planetName})
+  `;
 
-  const prompt2 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2);
-  const r2 = callGemini(prompt2, apiKey);
-
-  const prompt3 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3);
-  const r3 = callGemini(prompt3, apiKey);
+  // 3. Generate Parts
+  const r1 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1), apiKey);
+  const r2 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2), apiKey);
+  const r3 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3), apiKey);
 
   return {
     text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text,
@@ -553,19 +477,14 @@ function callGemini(text, key) {
   const json = JSON.parse(res.getContentText());
   
   if (json.error) throw new Error("Gemini Error: " + json.error.message);
-  
-  const content = (json.candidates && json.candidates[0].content) ? json.candidates[0].content.parts[0].text : "Error generating text.";
-  const usage = (json.usageMetadata && json.usageMetadata.totalTokenCount) ? json.usageMetadata.totalTokenCount : 0;
-
-  return { text: content, usage: usage };
+  return {
+    text: (json.candidates && json.candidates[0].content) ? json.candidates[0].content.parts[0].text : "Error",
+    usage: (json.usageMetadata && json.usageMetadata.totalTokenCount) ? json.usageMetadata.totalTokenCount : 0
+  };
 }
 
-// ==========================================
-// 3. PDF & DELIVERY
-// ==========================================
-
 function createPdf(name, content, templateId) {
-  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Astro Report`);
+  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Phone Astro Report`);
   const doc = DocumentApp.openById(copy.getId());
   const body = doc.getBody();
 
@@ -576,7 +495,7 @@ function createPdf(name, content, templateId) {
     .replace(/^\s*[\*\-]\s+/gm, "") 
     .trim();
   
-  body.replaceText("{{NAME}}", name);
+  body.replaceText("{{NAME}}", name); // Might be empty if no name used
   body.replaceText("{{REPORT}}", cleanText);
   body.replaceText("{{report}}", cleanText);
   
