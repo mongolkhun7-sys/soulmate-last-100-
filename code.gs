@@ -13,6 +13,8 @@ const CONFIG = {
   BATCH_SIZE: 3, 
   GEMINI_MODEL: "gemini-2.5-flash", 
   TEMPERATURE: 0.8, 
+  PRICE: 5000,
+  SUCCESS_URL: "https://m.me/YOUR_PAGE_ID_HERE", // TODO: Replace with your ManyChat/Page URL
 
   // --- COLUMN MAPPING (0-based) ---
   COLUMNS: {
@@ -25,7 +27,9 @@ const CONFIG = {
     DEBUG: 6,     // G
     DATE: 7,      // H
     VER: 8,       // I
-    ERROR: 9      // J
+    ERROR: 9,     // J
+    PAYMENT_LINK: 10,   // K
+    PAYMENT_STATUS: 11  // L
   },
 
   MAX_EXECUTION_TIME: 360000, 
@@ -212,8 +216,10 @@ function main() {
 
       const row = rows[i];
       const status = row[CONFIG.COLUMNS.STATUS];
+      const paymentStatus = row[CONFIG.COLUMNS.PAYMENT_STATUS];
       
-      if (status === "DONE" || String(status).includes("ERROR") || !row[CONFIG.COLUMNS.INPUT]) continue;
+      // Filter: Must be PAID to proceed, must not be DONE/ERROR, must have INPUT
+      if (paymentStatus !== "PAID" || status === "DONE" || String(status).includes("ERROR") || !row[CONFIG.COLUMNS.INPUT]) continue;
 
       sheet.getRange(i + 1, CONFIG.COLUMNS.STATUS + 1).setValue("Processing...");
       SpreadsheetApp.flush();
@@ -626,4 +632,181 @@ function sendManyChat(subscriberId, pdfUrl, name, token) {
   const res = UrlFetchApp.fetch(url, options);
   const json = JSON.parse(res.getContentText());
   if (json.status !== "success") throw new Error("ManyChat Error: " + JSON.stringify(json));
+}
+
+// ==========================================
+// 4. PAYMENT INTEGRATION (BYL.MN)
+// ==========================================
+
+function createBylCheckout(userId, amount, description, project_id, token) {
+  const url = `https://byl.mn/api/v1/projects/${project_id}/checkouts`;
+
+  // NOTE: client_reference_id is critical for matching webhook back to user
+  const payload = {
+    "client_reference_id": String(userId),
+    "success_url": CONFIG.SUCCESS_URL,
+    "items": [
+        {
+            "price_data": {
+                "unit_amount": amount,
+                "product_data": {
+                    "name": description
+                }
+            },
+            "quantity": 1
+        }
+    ]
+  };
+
+  const options = {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+
+  const response = UrlFetchApp.fetch(url, options);
+  const json = JSON.parse(response.getContentText());
+
+  if (!json.data || !json.data.url) {
+    throw new Error("BYL API Error: " + JSON.stringify(json));
+  }
+
+  return {
+    checkoutUrl: json.data.url,
+    checkoutId: json.data.id
+  };
+}
+
+// ==========================================
+// 5. PAYMENT PROCESSING WORKFLOW
+// ==========================================
+
+function processNewLeads() {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return;
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
+  const rows = sheet.getDataRange().getValues();
+  const BYL_TOKEN = PropertiesService.getScriptProperties().getProperty("BYL_API_TOKEN");
+  const BYL_PROJECT = PropertiesService.getScriptProperties().getProperty("BYL_PROJECT_ID");
+  const MANYCHAT_TOKEN = PropertiesService.getScriptProperties().getProperty("MANYCHAT_API_TOKEN");
+
+  try {
+    // Start from row 1 (skip header)
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      const status = row[CONFIG.COLUMNS.STATUS];
+      const paymentStatus = row[CONFIG.COLUMNS.PAYMENT_STATUS];
+      const input = row[CONFIG.COLUMNS.INPUT];
+      const contactId = row[CONFIG.COLUMNS.ID];
+
+      // Condition: Input exists, Status is not DONE, Payment Status is empty
+      if (input && status !== "DONE" && !paymentStatus) {
+        try {
+          // 1. Create Checkout
+          const checkout = createBylCheckout(contactId, CONFIG.PRICE, CONFIG.PRODUCT_NAME, BYL_PROJECT, BYL_TOKEN);
+
+          // 2. Update Sheet
+          sheet.getRange(i + 1, CONFIG.COLUMNS.PAYMENT_LINK + 1).setValue(checkout.checkoutUrl);
+          sheet.getRange(i + 1, CONFIG.COLUMNS.PAYMENT_STATUS + 1).setValue("WAITING_PAYMENT");
+
+          // 3. Send Payment Link via ManyChat
+          // We create a custom message for payment
+          const msg = `🔮 Сайн байна уу? Таны зурхай гарахад бэлэн боллоо. \n\nТөлбөр: ${CONFIG.PRICE}₮\nДоорх линкээр орж төлбөрөө төлнө үү: \n\n${checkout.checkoutUrl}`;
+
+          sendManyChatTextOnly(contactId, msg, MANYCHAT_TOKEN);
+
+        } catch (e) {
+          console.error("Payment Link Gen Error: " + e.message);
+          sheet.getRange(i + 1, CONFIG.COLUMNS.ERROR + 1).setValue("Payment Gen Error: " + e.message);
+        }
+      }
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function sendManyChatTextOnly(subscriberId, text, token) {
+  const url = "https://api.manychat.com/fb/sending/sendContent";
+  const payload = {
+    "subscriber_id": String(subscriberId).trim(),
+    data: {
+      version: "v2",
+      content: { messages: [{ type: "text", text: text }] }
+    }
+  };
+  const options = {
+    method: "post",
+    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
+  };
+  const res = UrlFetchApp.fetch(url, options);
+  const json = JSON.parse(res.getContentText());
+  if (json.status !== "success") throw new Error("ManyChat Error: " + JSON.stringify(json));
+}
+
+// ==========================================
+// 6. WEBHOOK HANDLER
+// ==========================================
+
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(10000)) return ContentService.createTextOutput("Busy");
+
+  try {
+    const signature = e.postData.type === "application/json" ? e.headers["Byl-Signature"] : null;
+    const webhookSecret = PropertiesService.getScriptProperties().getProperty("BYL_WEBHOOK_SECRET");
+
+    // Security Check: Verify Signature if Secret is set
+    if (webhookSecret && signature) {
+      const computed = Utilities.computeHmacSha256Signature(e.postData.contents, webhookSecret)
+        .map(byte => ('0' + (byte & 0xFF).toString(16)).slice(-2)).join('');
+
+      if (computed !== signature) {
+        console.error("Invalid Webhook Signature");
+        return ContentService.createTextOutput("Invalid Signature");
+      }
+    } else if (webhookSecret) {
+       console.error("Missing Webhook Signature Header");
+       return ContentService.createTextOutput("Missing Signature");
+    }
+
+    const postData = JSON.parse(e.postData.contents);
+
+    // Validate Event Type
+    if (postData.type !== "checkout.completed") {
+      return ContentService.createTextOutput("Ignored Event Type");
+    }
+
+    const dataObj = postData.data.object;
+    const clientRefId = dataObj.client_reference_id; // This is our User ID / Row ID
+    const status = dataObj.status;
+
+    if (status === "complete" && clientRefId) {
+      // Find row with this ID
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
+      const rows = sheet.getDataRange().getValues();
+
+      for (let i = 1; i < rows.length; i++) {
+        // Ensure type matching for ID
+        if (String(rows[i][CONFIG.COLUMNS.ID]) === String(clientRefId)) {
+          sheet.getRange(i + 1, CONFIG.COLUMNS.PAYMENT_STATUS + 1).setValue("PAID");
+          break; // Found and updated
+        }
+      }
+    }
+
+    return ContentService.createTextOutput("Success");
+  } catch (error) {
+    console.error("Webhook Error", error);
+    return ContentService.createTextOutput("Error");
+  } finally {
+    lock.releaseLock();
+  }
 }
