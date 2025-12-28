@@ -147,11 +147,13 @@ function callGeminiAgent(input, productInfo, history) {
   GOAL: Verify payment based on user chat.
 
   RULES:
-  1. If user says they paid but didn't send a photo:
+  1. If user says they haven't paid yet ("шилжүүлээгүй", "төлөөгүй", "амжаагүй"):
+     - Reply: "Ойлголоо. Та төлбөрөө төлсний дараа баримтаа эсвэл гүйлгээний утгаа бичээрэй."
+  2. If user says they paid but didn't send a photo:
      - Ask: "Гүйлгээний утга (Description) дээр юу бичсэн бэ?"
      - Then Ask: "Хэдэн цагт шилжүүлсэн бэ?"
-  2. If they answer honestly or give a Transaction ID/Phone number, reply with the tag [APPROVED] at the end.
-  3. If they ask about the product, answer briefly.
+  3. If they answer honestly or give a Transaction ID/Phone number, reply with the tag [APPROVED] at the end.
+  4. If they ask about the product, answer briefly.
 
   USER INPUT: ${input}
   HISTORY: ${history}
