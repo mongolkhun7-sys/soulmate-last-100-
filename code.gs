@@ -1,6 +1,6 @@
 /****************************************************************************************
  * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR + UNIVERSAL AI AGENT
- * VERSION: v5.0 - Ultimate Edition (Payment + AI Chat + Report)
+ * VERSION: v5.1 - Smart Admin Edition
  * UPDATED: 2025-06-24
  ****************************************************************************************/
 
@@ -9,24 +9,35 @@ const CONFIG = {
   PRODUCT_NAME: "Таны Санхүүгийн Код & Баяжих Зурхай",
   BYL_PRODUCT_ID: "1511",
 
-  // --- 2. SYSTEM CONFIG ---
-  VERSION: "v5.0-Ultimate",
+  // --- 2. KNOWLEDGE BASE (AI BRAIN) ---
+  // Энд бичсэн мэдээллийг AI "үнэн" гэж үзээд хариулна.
+  PRODUCT_KNOWLEDGE: `
+  - PRODUCT: "Financial Code & Wealth Horoscope" (Санхүүгийн Код & Баяжих Зурхай).
+  - CONTENT: 10-page professional PDF report calculated specifically from the user's Birth Date & Time.
+  - SOCIAL PROOF: Over 1,000 satisfied customers have received this report.
+  - STANDARD PRICE: 99,000₮.
+  - ACTIVE PROMO (7 Days): 19,000₮.
+  - SPECIAL BROADCAST DEAL: Sometimes we send a 24-hour broadcast offer for 9,900₮.
+    * RULE: If the user mentions "9,900" or "promo message", HONOR IT. Say: "Тийм ээ, танд хямдралын мессеж ирсэн бол тухайн өдөртөө багтаад 9,900₮-өөр авах боломжтой."
+  - PAYMENT INFO: Account usually provided in the chat flow.
+  `,
+
+  // --- 3. SYSTEM CONFIG ---
+  VERSION: "v5.1-SmartAdmin",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 5,
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.8, 
+  TEMPERATURE: 0.9, // Higher for more natural/creative tone
 
-  // --- 3. COLUMN MAPPING ---
+  // --- 4. COLUMN MAPPING ---
   COLUMNS: {
     NAME: 0, ID: 1, INPUT: 2, PDF: 3, STATUS: 4,
     TOKEN: 5, DEBUG: 6, DATE: 7, VER: 8, ERROR: 9
   },
 
-  // --- 4. AI PERSONA FOR REPORT WRITING ---
+  // --- 5. AI PERSONA FOR REPORT WRITING (NOT CHAT) ---
   AI_SETTINGS: {
     ROLE: "Professional Financial Astrologer & Wealth Psychologist.",
-    TONE: "Analytical, empowering, strategic, and deeply insightful.",
-    CORE_RULES: `1. NO INTRODUCTIONS. 2. NO BULLET POINTS. 3. FORMATTING: Use **BOLD** for subheadings. 4. ADDRESSING: Address user as "Чи" (You).`,
     PROMPTS: {
       PART_1: `TASK: Write PART 1 (Identity & Numerology). Context: {{name}}, {{dob}}, {{yearAnimal}} year, {{zodiacSign}}. Focus on Financial Character.`,
       PART_2: `TASK: Write PART 2 (Psychology & Career). Context: Destiny {{destinyNumber}}. Focus on Money Mindset and Career Paths.`,
@@ -34,7 +45,7 @@ const CONFIG = {
     }
   },
 
-  // --- 5. STATIC DATA ---
+  // --- 6. STATIC DATA ---
   TSAGAAN_SAR: { 1940:"02-08", 1980:"02-16", 1981:"02-05", 1982:"02-24", 1983:"02-13", 1984:"02-02", 1985:"02-20", 1986:"02-09", 1987:"01-29", 1988:"02-17", 1989:"02-06", 1990:"02-27", 1991:"02-15", 1992:"02-04", 1993:"02-23", 1994:"02-10", 1995:"01-31", 1996:"02-19", 1997:"02-07", 1998:"02-28", 1999:"02-16", 2000:"02-05", 2001:"02-24", 2002:"02-12", 2003:"02-01", 2004:"02-22", 2005:"02-09", 2006:"01-29", 2007:"02-18", 2008:"02-07", 2009:"02-25", 2010:"02-14", 2011:"02-03", 2012:"02-22", 2013:"02-11", 2014:"01-31", 2015:"02-19", 2016:"02-09", 2017:"02-27", 2018:"02-16", 2019:"02-05", 2020:"02-24", 2021:"02-12", 2022:"02-02", 2023:"02-21", 2024:"02-10", 2025:"02-28" },
   ANIMALS: ["Хулгана", "Үхэр", "Бар", "Туулай", "Луу", "Могой", "Морь", "Хонь", "Бич", "Тахиа", "Нохой", "Гахай"],
   ELEMENTS_BY_LAST_DIGIT: { 0: "Төмөр", 1: "Төмөр", 2: "Усан", 3: "Усан", 4: "Модон", 5: "Модон", 6: "Гал", 7: "Гал", 8: "Шороон", 9: "Шороон" },
@@ -67,7 +78,6 @@ function doPost(e) {
   }
 
   // 1. ROUTE: AI Agent Chat (From ManyChat)
-  // Check if "action" is "ai_chat" in either params or body
   if (params.action === "ai_chat" || postBody.action === "ai_chat") {
     return handleAIChat(postBody);
   }
@@ -78,7 +88,6 @@ function doPost(e) {
   }
 
   // 3. ROUTE: Webhook (From Byl.mn)
-  // Check for Byl specific event type
   if (postBody.type === "checkout.completed") {
     return handleWebhook(postBody);
   }
@@ -90,7 +99,7 @@ function doPost(e) {
 
 function handleAIChat(data) {
   const userInput = data.user_input || "";
-  const productInfo = data.product_info || "Product info missing";
+  const productInfo = data.product_info || "";
   const history = data.history || "";
 
   // RULE 1: If user sends an IMAGE (URL), Approve immediately
@@ -100,7 +109,7 @@ function handleAIChat(data) {
 
   // RULE 2: If TEXT, let Gemini handle it
   try {
-    const aiResponse = callGeminiAgent(userInput, productInfo, history);
+    const aiResponse = callGeminiAgent(userInput, history);
     if (aiResponse.includes("[APPROVED]")) {
       const cleanMessage = aiResponse.replace("[APPROVED]", "").trim();
       return responseJSON({ status: "approved", message: cleanMessage || "Төлбөр баталгаажлаа." });
@@ -110,6 +119,50 @@ function handleAIChat(data) {
   } catch (err) {
     return responseJSON({ status: "reply", message: "Уучлаарай, системд алдаа гарлаа. Та дахин бичнэ үү." });
   }
+}
+
+function callGeminiAgent(input, history) {
+  const props = PropertiesService.getScriptProperties();
+  const API_KEY = props.getProperty("GEMINI_API_KEY");
+
+  const PROMPT = `
+  ROLE: You are the Smart Sales Admin for the "Financial Horoscope" Facebook page.
+  TONE: Human-like, Professional but Friendly, Direct. Speak NATURAL MONGOLIAN.
+
+  KNOWLEDGE BASE:
+  ${CONFIG.PRODUCT_KNOWLEDGE}
+
+  GOAL: Verify payment OR Answer questions to help the user buy.
+
+  RULES:
+  1. **ABUSIVE LANGUAGE**: If the user swears, insults, or is aggressive, DO NOT REPLY (return empty string) OR just say "Та соёлтой харилцана уу."
+
+  2. **PAYMENT VERIFICATION**:
+     - Do NOT ask for receipt immediately if they just started chatting.
+     - ASK: "Гүйлгээний утга дээр юу бичсэн бэ?", "Хэдэн цагт шилжүүлсэн бэ?" (Ask 1-2 details).
+     - **EFFORT SCORE**: If the user answers honestly and tries to provide details (even if not perfect), accept it.
+     - **APPROVAL**: If satisfied, add [APPROVED] to the end of your message.
+     - **GHOSTING**: If they stop replying or give random answers, do not approve.
+
+  3. **PRICING & OFFERS**:
+     - Standard Promo is 19,000₮.
+     - **BROADCAST EXCEPTION**: If they mention "9,900" or "SMS deal", say: "Yes, since you received that offer, you can pay 9,900₮ today only."
+
+  4. **UNPAID USERS**:
+     - If they say "haven't paid yet" (төлөөгүй, амжаагүй): Provide encouragement and say "Waiting for your payment".
+
+  USER INPUT: "${input}"
+  HISTORY:
+  ${history}
+  `;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+  const payload = { contents: [{ parts: [{ text: PROMPT }] }] };
+  const res = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
+  const json = JSON.parse(res.getContentText());
+
+  if (json.candidates && json.candidates[0]) return json.candidates[0].content.parts[0].text;
+  return "Ойлгомжгүй байна.";
 }
 
 function handleCreateLink(userId) {
@@ -136,43 +189,11 @@ function handleWebhook(data) {
   }
 }
 
-// --- HELPER FUNCTIONS ---
-
-function callGeminiAgent(input, productInfo, history) {
-  const props = PropertiesService.getScriptProperties();
-  const API_KEY = props.getProperty("GEMINI_API_KEY");
-  
-  const PROMPT = `
-  ROLE: You are the Smart Admin for "${productInfo}".
-  GOAL: Verify payment based on user chat.
-
-  RULES:
-  1. If user says they haven't paid yet ("шилжүүлээгүй", "төлөөгүй", "амжаагүй"):
-     - Reply: "Ойлголоо. Та төлбөрөө төлсний дараа баримтаа эсвэл гүйлгээний утгаа бичээрэй."
-  2. If user says they paid but didn't send a photo:
-     - Ask: "Гүйлгээний утга (Description) дээр юу бичсэн бэ?"
-     - Then Ask: "Хэдэн цагт шилжүүлсэн бэ?"
-  3. If they answer honestly or give a Transaction ID/Phone number, reply with the tag [APPROVED] at the end.
-  4. If they ask about the product, answer briefly.
-
-  USER INPUT: ${input}
-  HISTORY: ${history}
-  `;
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
-  const payload = { contents: [{ parts: [{ text: PROMPT }] }] };
-  const res = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
-  const json = JSON.parse(res.getContentText());
-
-  if (json.candidates && json.candidates[0]) return json.candidates[0].content.parts[0].text;
-  return "Ойлгомжгүй байна.";
-}
-
 function createBylCheckout(userId) {
   const props = PropertiesService.getScriptProperties();
   const TOKEN = props.getProperty("BYL_API_TOKEN");
   const PID = props.getProperty("BYL_PROJECT_ID");
-  const PRICE = CONFIG.BYL_PRODUCT_ID; // Use ID from CONFIG (1511)
+  const PRICE = CONFIG.BYL_PRODUCT_ID;
 
   const url = `https://byl.mn/api/v1/projects/${PID}/checkouts`;
   const payload = {
@@ -190,10 +211,6 @@ function createBylCheckout(userId) {
 function triggerManyChatPaymentSuccess(userId) {
   const props = PropertiesService.getScriptProperties();
   const MC_TOKEN = props.getProperty("MANYCHAT_API_TOKEN");
-  // If payment succeeds via Byl, we can trigger the "Payment OK" flow OR just send a message.
-  // Here we use a Flow ID if saved, or just assume the user will be handled by the next step.
-  // Note: For this setup, we usually trigger a specific Flow.
-  // Ensure PAYMENT_SUCCESS_FLOW_ID is in Script Properties.
   const FLOW_ID = props.getProperty("PAYMENT_SUCCESS_FLOW_ID");
   if(!FLOW_ID) return;
 
