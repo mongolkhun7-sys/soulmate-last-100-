@@ -1,197 +1,243 @@
 /****************************************************************************************
- * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR (ZURHAI AI)
- * VERSION: v3.0 - Master Template (Configurable)
- * AUTHOR: Saruulbat System (Refactored by Jules)
- * MODEL: gemini-2.5-flash
+ * PRODUCT: DIGITAL ASTROLOGY REPORT GENERATOR + UNIVERSAL AI AGENT
+ * VERSION: v5.1 - Smart Admin Edition
+ * UPDATED: 2025-06-24
  ****************************************************************************************/
 
 const CONFIG = {
-  // --- SYSTEM CONFIG ---
-  VERSION: "v3.0-MasterTemplate",
-  PRODUCT_NAME: "Таны Хувь Заяаны Код - Дэлгэрэнгүй Тайлан",
-  SHEET_NAME: "Sheet1",
-  BATCH_SIZE: 3, 
-  GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.8, 
+  // --- 1. PRODUCT SETTINGS ---
+  PRODUCT_NAME: "Таны Санхүүгийн Код & Баяжих Зурхай",
+  BYL_PRODUCT_ID: "1511",
 
-  // --- COLUMN MAPPING (0-based) ---
+  // --- 2. KNOWLEDGE BASE (AI BRAIN) ---
+  // Энд бичсэн мэдээллийг AI "үнэн" гэж үзээд хариулна.
+  PRODUCT_KNOWLEDGE: `
+  - PRODUCT: "Financial Code & Wealth Horoscope" (Санхүүгийн Код & Баяжих Зурхай).
+  - CONTENT: 10-page professional PDF report calculated specifically from the user's Birth Date & Time.
+  - SOCIAL PROOF: Over 1,000 satisfied customers have received this report.
+  - STANDARD PRICE: 99,000₮.
+  - ACTIVE PROMO (7 Days): 19,000₮.
+  - SPECIAL BROADCAST DEAL: Sometimes we send a 24-hour broadcast offer for 9,900₮.
+    * RULE: If the user mentions "9,900" or "promo message", HONOR IT. Say: "Тийм ээ, танд хямдралын мессеж ирсэн бол тухайн өдөртөө багтаад 9,900₮-өөр авах боломжтой."
+  - PAYMENT INFO: Account usually provided in the chat flow.
+  `,
+
+  // --- 3. SYSTEM CONFIG ---
+  VERSION: "v5.1-SmartAdmin",
+  SHEET_NAME: "Sheet1",
+  BATCH_SIZE: 5,
+  GEMINI_MODEL: "gemini-2.5-flash", 
+  TEMPERATURE: 0.9, // Higher for more natural/creative tone
+
+  // --- 4. COLUMN MAPPING ---
   COLUMNS: {
-    NAME: 0,      // A
-    ID: 1,        // B
-    INPUT: 2,     // C
-    PDF: 3,       // D
-    STATUS: 4,    // E
-    TOKEN: 5,     // F
-    DEBUG: 6,     // G
-    DATE: 7,      // H
-    VER: 8,       // I
-    ERROR: 9      // J
+    NAME: 0, ID: 1, INPUT: 2, PDF: 3, STATUS: 4,
+    TOKEN: 5, DEBUG: 6, DATE: 7, VER: 8, ERROR: 9
   },
 
-  MAX_EXECUTION_TIME: 360000, 
-  SAFETY_BUFFER: 60000,
-
-  // ==================================================================================
-  // ⚙️ MASTER CONFIGURATION (EDIT HERE FOR NEW PRODUCTS)
-  // ==================================================================================
-  
+  // --- 5. AI PERSONA FOR REPORT WRITING (NOT CHAT) ---
   AI_SETTINGS: {
-    // 1. THE PERSONA
-    ROLE: "Professional Mongolian Astrologer & Psychologist.",
-    
-    // 2. THE TONE OF VOICE
-    TONE: "Literary, poetic, deep, philosophical. Avoid robotic or dry translated phrases. Write like a wise mentor speaking to a soul.",
-    
-    // 3. CORE RULES (Apply to all chapters)
-    CORE_RULES: `
-    1. NO INTRODUCTIONS: Do not say "Hello", "I am Saruulbat", or "Here is your report". Start directly with the Chapter Title.
-    2. NO BULLET POINTS: Do not use '*' or '-' for lists. Use full paragraphs or bold subheaders. The text must look like a book, not a PowerPoint slide.
-    3. FORMATTING: Use **BOLD** for important subheadings. Separate paragraphs with empty lines.
-    4. LANGUAGE PRECISION: Do not use weak words like "Магадгүй" (Maybe). Instead use "Өндөр магадлалтай" (High probability), "Танд тохионо" (Will happen to you), "Одод ингэж зааж байна" (The stars indicate).
-    5. ADDRESSING: Always address the user as "Чи" (You) - intimate and direct. Use "Чиний" (Your), "Чамайг" (You - accusative), "Чамд" (to You) naturally. NEVER use "Та" (Formal).
-    6. UNKNOWN TIME LOGIC: If 'Birth Time' or 'Ascendant' is "Тодорхойгүй" or "Unknown", DO NOT generate specific predictions based on the hour. Instead, explicitly state that since the birth time is unknown, the 'Hidden Self/Ascendant' reading is general.
-    7. BOLD SAFETY: When using ** for bold titles, you MUST close them (e.g., **Title**). NEVER leave them open like (**Title...). This is critical.
-    `,
-
-    // 4. CHAPTER PROMPTS (Use {{variables}} to insert data)
+    ROLE: "Professional Financial Astrologer & Wealth Psychologist.",
     PROMPTS: {
-      // --- PART 1: IDENTITY ---
-      PART_1: `
-      TASK: Write PART 1 (Chapters 1 & 2).
-      
-      Start with a boxed summary of their astrological profile.
-      
-      **✨ ТАНЫ ЗУРХАЙН ТҮЛХҮҮР ӨГӨГДЛҮҮД**
-      👤 **Нэр:** {{name}}
-      📅 **Төрсөн огноо:** {{dob}}
-      🐉 **Монгол жил:** {{yearElement}} {{yearAnimal}}
-      ✨ **Өрнийн орд:** {{zodiacElement}} махбодьтой {{zodiacSign}}
-      {{timeInfoLine}}
-      🔢 **Амьдралын тоо:** {{lifePath}}
-      
-      **📖 БҮЛЭГ 1: ЧИНИЙ ДОТООД ЕРТӨНЦ & МӨН ЧАНАР**
-      - Analyze the mix of {{yearAnimal}} and {{zodiacSign}}. Use the concept "{{elementRelationship}}" but write it poetically (e.g., "Fire and Water dance in your soul...").
-      - Contrast their outer appearance (Mask) vs inner reality (Truth).
-      {{timeAnalysisInstructions}}
-      - Explain Life Path {{lifePath}} and Birth Day {{birthDayNum}}.
-        * IMPORTANT: Briefly explain HOW this number was calculated (summing digits of {{dob}}) to build trust. If it is a Master Number (11, 22, 33), explain why we didn't reduce it further. (Mention Karmic Debt if 13, 14, 16, 19).
-
-      **📖 БҮЛЭГ 2: ХАЙР ДУРЛАЛЫН ХЭВ МАЯГ**
-      - What is their "Love Language"? What do they crave?
-      - Their Shadow Side: Why do they fail? (e.g., Saviour Complex, too demanding).
-      - Compatibility: Who fits them? Who destroys them?
-      
-      (Write in deep, flowing paragraphs. NO BULLETS).
-      `,
-
-      // --- PART 2: PARTNER & TIMING ---
-      PART_2: `
-      TASK: Write PART 2 (Chapters 3 & 4).
-      CONTEXT: We already discussed their character ({{yearAnimal}}, {{zodiacSign}}). Now focus on their Future Partner and Timing.
-      
-      **📖 БҮЛЭГ 3: ИРЭЭДҮЙН ХАНЬ "THE AVATAR"**
-      - REQUIREMENT: For this chapter ONLY, you MUST use numbered subtitles to separate the sections.
-      - TARGET: The partner must be MONGOLIAN (No blue eyes/blonde hair). Describe realistic Mongolian features.
-      - GENDER: Remember to describe the OPPOSITE gender of {{gender}}.
-      - Structure:
-        **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
-        **2. Зан чанар:** (Describe personality)
-        **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
-      
-      **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
-      - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
-        * 1-р Хаалга: {{transit1}}
-        * 2-р Хаалга: {{transit2}}
-        * 3-р Хаалга: {{transit3}}
-      - Explain WHY these years are significant (Trine, Jupiter Return, etc) based on the status provided.
-      - Provide advice for each period.
-      
-      (Write in deep, flowing paragraphs. NO BULLETS).
-      `,
-
-      // --- PART 3: FORECAST ---
-      PART_3: `
-      TASK: Write PART 3 (Chapter 5 ONLY).
-      CONTEXT: The report continues from the Transits section.
-      IMPORTANT: Do NOT write Chapter 6, Rituals, Imago Effect, or Conclusion. These are already pre-written in the template. Just finish Chapter 5.
-      
-      **📖 БҮЛЭГ 5: ИРЭХ ЖИЛИЙН ЕРӨНХИЙ ЗУРХАЙ ({{forecastYear}} ОН - {{nextYearAnimal}} ЖИЛ)**
-      (Context: We are forecasting for {{forecastYear}}).
-      - How does the {{nextYearAnimal}} Year ({{forecastYear}}) affect a {{yearAnimal}}? 
-      - General Outlook & Career/Money advice.
-      - Provide specific advice for maintaining balance in {{forecastYear}}.
-      
-      (Write in deep, flowing paragraphs. NO BULLETS. STOP immediately after Chapter 5).
-      `
+      PART_1: `TASK: Write PART 1 (Identity & Numerology). Context: {{name}}, {{dob}}, {{yearAnimal}} year, {{zodiacSign}}. Focus on Financial Character.`,
+      PART_2: `TASK: Write PART 2 (Psychology & Career). Context: Destiny {{destinyNumber}}. Focus on Money Mindset and Career Paths.`,
+      PART_3: `TASK: Write PART 3 (Forecast). Context: Personal Years {{py1}}, {{py2}}, {{py3}}. Focus on 3-Year Financial Forecast.`
     }
   },
 
- // ==================================================================================
-  // 🧠 STATIC DATA (DO NOT EDIT BELOW THIS LINE)
-  // ==================================================================================
-  
-  TSAGAAN_SAR: {
-    // 1940s
-    1945: "02-13", 1946: "02-02", 1947: "01-22", 1948: "02-10", 1949: "01-29",
-    // 1950s
-    1950: "02-17", 1951: "02-06", 1952: "01-27", 1953: "02-14", 1954: "02-03",
-    1955: "02-24", 1956: "02-12", 1957: "01-31", 1958: "02-18", 1959: "02-08",
-    // 1960s
-    1960: "02-27", 1961: "02-15", 1962: "02-05", 1963: "02-25", 1964: "02-13",
-    1965: "02-02", 1966: "02-21", 1967: "02-09", 1968: "01-30", 1969: "02-17",
-    // 1970s
-    1970: "02-06", 1971: "02-27", 1972: "02-15", 1973: "02-06", 1974: "02-23",
-    1975: "02-11", 1976: "01-31", 1977: "02-18", 1978: "02-07", 1979: "02-28",
-    // 1980s
-    1980: "02-16", 1981: "02-05", 1982: "02-24", 1983: "02-13", 1984: "02-02",
-    1985: "02-20", 1986: "02-09", 1987: "01-29", 1988: "02-17", 1989: "02-06",
-    // 1990s
-    1990: "02-27", 1991: "02-15", 1992: "02-04", 1993: "02-23", 1994: "02-10",
-    1995: "01-31", 1996: "02-19", 1997: "02-07", 1998: "02-28", 1999: "02-16",
-    // 2000s
-    2000: "02-05", 2001: "02-24", 2002: "02-12", 2003: "02-01", 2004: "02-22",
-    2005: "02-09", 2006: "01-29", 2007: "02-18", 2008: "02-07", 2009: "02-25",
-    // 2010s
-    2010: "02-14", 2011: "02-03", 2012: "02-22", 2013: "02-11", 2014: "01-31",
-    2015: "02-19", 2016: "02-09", 2017: "02-27", 2018: "02-16", 2019: "02-05",
-    // 2020s
-    2020: "02-24", 2021: "02-12", 2022: "02-02", 2023: "02-21", 2024: "02-10",
-    2025: "02-28" // Note: 2025 Tsagaan Sar might vary slightly (Feb 28 or Mar 1) depending on source, but Feb 28 is safe.
-  },
-
+  // --- 6. STATIC DATA ---
+  TSAGAAN_SAR: { 1940:"02-08", 1980:"02-16", 1981:"02-05", 1982:"02-24", 1983:"02-13", 1984:"02-02", 1985:"02-20", 1986:"02-09", 1987:"01-29", 1988:"02-17", 1989:"02-06", 1990:"02-27", 1991:"02-15", 1992:"02-04", 1993:"02-23", 1994:"02-10", 1995:"01-31", 1996:"02-19", 1997:"02-07", 1998:"02-28", 1999:"02-16", 2000:"02-05", 2001:"02-24", 2002:"02-12", 2003:"02-01", 2004:"02-22", 2005:"02-09", 2006:"01-29", 2007:"02-18", 2008:"02-07", 2009:"02-25", 2010:"02-14", 2011:"02-03", 2012:"02-22", 2013:"02-11", 2014:"01-31", 2015:"02-19", 2016:"02-09", 2017:"02-27", 2018:"02-16", 2019:"02-05", 2020:"02-24", 2021:"02-12", 2022:"02-02", 2023:"02-21", 2024:"02-10", 2025:"02-28" },
   ANIMALS: ["Хулгана", "Үхэр", "Бар", "Туулай", "Луу", "Могой", "Морь", "Хонь", "Бич", "Тахиа", "Нохой", "Гахай"],
-  
-  ELEMENTS_BY_LAST_DIGIT: {
-    0: "Төмөр", 1: "Төмөр", 2: "Усан", 3: "Усан", 4: "Модон", 5: "Модон", 6: "Гал", 7: "Гал", 8: "Шороон", 9: "Шороон"
-  },
-
+  ELEMENTS_BY_LAST_DIGIT: { 0: "Төмөр", 1: "Төмөр", 2: "Усан", 3: "Усан", 4: "Модон", 5: "Модон", 6: "Гал", 7: "Гал", 8: "Шороон", 9: "Шороон" },
   ZODIACS: [
-    { name: "Матар", element: "Газар", start: "12-22", end: "01-19" },
-    { name: "Хумх", element: "Агаар", start: "01-20", end: "02-18" },
-    { name: "Загас", element: "Ус", start: "02-19", end: "03-20" },
-    { name: "Хонь", element: "Гал", start: "03-21", end: "04-19" },
-    { name: "Үхэр", element: "Газар", start: "04-20", end: "05-20" },
-    { name: "Ихэр", element: "Агаар", start: "05-21", end: "06-20" },
-    { name: "Мэлхий", element: "Ус", start: "06-21", end: "07-22" },
-    { name: "Арслан", element: "Гал", start: "07-23", end: "08-22" },
-    { name: "Охин", element: "Газар", start: "08-23", end: "09-22" },
-    { name: "Жинлүүр", element: "Агаар", start: "09-23", end: "10-22" },
-    { name: "Хилэнц", element: "Ус", start: "10-23", end: "11-21" },
-    { name: "Нум", element: "Гал", start: "11-22", end: "12-21" }
+    { name: "Матар", element: "Газар", start: "12-22", end: "01-19" }, { name: "Хумх", element: "Агаар", start: "01-20", end: "02-18" }, { name: "Загас", element: "Ус", start: "02-19", end: "03-20" }, { name: "Хонь", element: "Гал", start: "03-21", end: "04-19" },
+    { name: "Үхэр", element: "Газар", start: "04-20", end: "05-20" }, { name: "Ихэр", element: "Агаар", start: "05-21", end: "06-20" }, { name: "Мэлхий", element: "Ус", start: "06-21", end: "07-22" }, { name: "Арслан", element: "Гал", start: "07-23", end: "08-22" },
+    { name: "Охин", element: "Газар", start: "08-23", end: "09-22" }, { name: "Жинлүүр", element: "Агаар", start: "09-23", end: "10-22" }, { name: "Хилэнц", element: "Ус", start: "10-23", end: "11-21" }, { name: "Нум", element: "Гал", start: "11-22", end: "12-21" }
   ],
-
-  DELIVERY_MESSAGE: `🔮 Сайн байна уу, {{NAME}}? \n\nЧиний "Хувь Заяаны Код" тайлагдлаа. Энэ бол зүгээр нэг зурхай биш, чиний дотоод ертөнцийн газрын зураг юм.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай, линк 7 хоногийн дараа устаж магадгүй)`,
+  DELIVERY_MESSAGE: `💰 Сайн байна уу, {{NAME}}? \n\nЧиний "Санхүүгийн Код" бэлэн боллоо.\n\nФайл: {{URL}}\n\n(Татаж аваад хадгалаарай)`,
 };
 
-// --- MAIN FUNCTION ---
+// ==================================================================================
+// 💳 PART 1: UNIVERSAL CONTROLLER (Web App)
+// ==================================================================================
+
+function doGet(e) { return doPost(e); }
+
+function doPost(e) {
+  if (!e) return ContentService.createTextOutput("System Active.");
+
+  const params = e.parameter || {};
+  let postBody = {};
+  
+  try {
+    if (e.postData && e.postData.contents) {
+      postBody = JSON.parse(e.postData.contents);
+    }
+  } catch (err) {
+    // Ignore JSON parse errors for non-JSON requests
+  }
+
+  // 1. ROUTE: AI Agent Chat (From ManyChat)
+  if (params.action === "ai_chat" || postBody.action === "ai_chat") {
+    return handleAIChat(postBody);
+  }
+
+  // 2. ROUTE: Create Payment Link (From ManyChat)
+  if (params.action === "create_link") {
+    return handleCreateLink(params.user_id);
+  }
+
+  // 3. ROUTE: Webhook (From Byl.mn)
+  if (postBody.type === "checkout.completed") {
+    return handleWebhook(postBody);
+  }
+
+  return ContentService.createTextOutput("Unknown Action");
+}
+
+// --- CONTROLLER FUNCTIONS ---
+
+function handleAIChat(data) {
+  const userInput = data.user_input || "";
+  const productInfo = data.product_info || "";
+  const history = data.history || "";
+
+  // RULE 1: If user sends an IMAGE (URL), Approve immediately
+  if (String(userInput).match(/^https?:\/\/.*(jpg|jpeg|png|webp|gif)/i) || String(userInput).includes("cdn.manychat")) {
+    return responseJSON({ status: "approved", message: "Баримт хүлээн авлаа. Төлбөр баталгаажлаа! ✅" });
+  }
+
+  // RULE 2: If TEXT, let Gemini handle it
+  try {
+    const aiResponse = callGeminiAgent(userInput, history);
+    if (aiResponse.includes("[APPROVED]")) {
+      const cleanMessage = aiResponse.replace("[APPROVED]", "").trim();
+      return responseJSON({ status: "approved", message: cleanMessage || "Төлбөр баталгаажлаа." });
+    } else {
+      return responseJSON({ status: "reply", message: aiResponse });
+    }
+  } catch (err) {
+    return responseJSON({ status: "reply", message: "Уучлаарай, системд алдаа гарлаа. Та дахин бичнэ үү." });
+  }
+}
+
+function callGeminiAgent(input, history) {
+  const props = PropertiesService.getScriptProperties();
+  const API_KEY = props.getProperty("GEMINI_API_KEY");
+
+  const PROMPT = `
+  ROLE: You are the Smart Sales Admin for the "Financial Horoscope" Facebook page.
+  TONE: Human-like, Professional but Friendly, Direct. Speak NATURAL MONGOLIAN.
+
+  KNOWLEDGE BASE:
+  ${CONFIG.PRODUCT_KNOWLEDGE}
+
+  GOAL: Verify payment OR Answer questions to help the user buy.
+
+  RULES:
+  1. **ABUSIVE LANGUAGE**: If the user swears, insults, or is aggressive, DO NOT REPLY (return empty string) OR just say "Та соёлтой харилцана уу."
+
+  2. **PAYMENT VERIFICATION**:
+     - Do NOT ask for receipt immediately if they just started chatting.
+     - ASK: "Гүйлгээний утга дээр юу бичсэн бэ?", "Хэдэн цагт шилжүүлсэн бэ?" (Ask 1-2 details).
+     - **EFFORT SCORE**: If the user answers honestly and tries to provide details (even if not perfect), accept it.
+     - **APPROVAL**: If satisfied, add [APPROVED] to the end of your message.
+     - **GHOSTING**: If they stop replying or give random answers, do not approve.
+
+  3. **PRICING & OFFERS**:
+     - Standard Promo is 19,000₮.
+     - **BROADCAST EXCEPTION**: If they mention "9,900" or "SMS deal", say: "Yes, since you received that offer, you can pay 9,900₮ today only."
+
+  4. **UNPAID USERS**:
+     - If they say "haven't paid yet" (төлөөгүй, амжаагүй): Provide encouragement and say "Waiting for your payment".
+
+  USER INPUT: "${input}"
+  HISTORY:
+  ${history}
+  `;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${API_KEY}`;
+  const payload = { contents: [{ parts: [{ text: PROMPT }] }] };
+  const res = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
+  const json = JSON.parse(res.getContentText());
+
+  if (json.candidates && json.candidates[0]) return json.candidates[0].content.parts[0].text;
+  return "Ойлгомжгүй байна.";
+}
+
+function handleCreateLink(userId) {
+  if (!userId) return responseJSON({ error: "Missing user_id" });
+  try {
+    const url = createBylCheckout(userId);
+    return responseJSON({ url: url });
+  } catch (err) {
+    return responseJSON({ error: err.message });
+  }
+}
+
+function handleWebhook(data) {
+  try {
+    const object = data.data.object;
+    const manychatId = object.client_reference_id;
+    if (manychatId) {
+      triggerManyChatPaymentSuccess(manychatId);
+      return ContentService.createTextOutput("Success");
+    }
+    return ContentService.createTextOutput("Ignored");
+  } catch (err) {
+    return ContentService.createTextOutput("Webhook Error");
+  }
+}
+
+function createBylCheckout(userId) {
+  const props = PropertiesService.getScriptProperties();
+  const TOKEN = props.getProperty("BYL_API_TOKEN");
+  const PID = props.getProperty("BYL_PROJECT_ID");
+  const PRICE = CONFIG.BYL_PRODUCT_ID;
+
+  const url = `https://byl.mn/api/v1/projects/${PID}/checkouts`;
+  const payload = {
+    client_reference_id: String(userId),
+    customer_email: "guest@byl.mn",
+    items: [{ price_id: Number(PRICE), quantity: 1, adjustable_quantity: { enabled: false } }]
+  };
+
+  const res = UrlFetchApp.fetch(url, { method: "post", headers: { "Authorization": `Bearer ${TOKEN}`, "Content-Type": "application/json", "Accept": "application/json" }, payload: JSON.stringify(payload), muteHttpExceptions: true });
+  const json = JSON.parse(res.getContentText());
+  if (json.data && json.data.url) return json.data.url;
+  throw new Error("Byl API Error: " + JSON.stringify(json));
+}
+
+function triggerManyChatPaymentSuccess(userId) {
+  const props = PropertiesService.getScriptProperties();
+  const MC_TOKEN = props.getProperty("MANYCHAT_API_TOKEN");
+  const FLOW_ID = props.getProperty("PAYMENT_SUCCESS_FLOW_ID");
+  if(!FLOW_ID) return;
+
+  UrlFetchApp.fetch("https://api.manychat.com/fb/sending/sendFlow", {
+    method: "post",
+    headers: { "Authorization": `Bearer ${MC_TOKEN}`, "Content-Type": "application/json" },
+    payload: JSON.stringify({ subscriber_id: userId, flow_ns: FLOW_ID }),
+    muteHttpExceptions: true
+  });
+}
+
+function responseJSON(data) {
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
+
+// ==================================================================================
+// 🔮 PART 2: REPORT GENERATOR (Time Trigger)
+// ==================================================================================
+
 function main() {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(10000)) return;
 
-  const START_TIME = new Date().getTime();
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_NAME);
-  const rows = sheet.getDataRange().getValues();
+  if (!sheet) return;
   
+  const rows = sheet.getDataRange().getValues();
   const KEYS = {
     GEMINI: PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"),
     MANYCHAT: PropertiesService.getScriptProperties().getProperty("MANYCHAT_API_TOKEN"),
@@ -200,20 +246,15 @@ function main() {
 
   let processedCount = 0;
   const TIME_LIMIT = 270000; 
+  const START_TIME = new Date().getTime();
 
   try {
     for (let i = 1; i < rows.length; i++) {
-      if (new Date().getTime() - START_TIME > TIME_LIMIT) {
-        console.warn("⏳ TIME GUARD: Stopping batch execution.");
-        break; 
-      }
-      
+      if (new Date().getTime() - START_TIME > TIME_LIMIT) break;
       if (processedCount >= CONFIG.BATCH_SIZE) break;
 
       const row = rows[i];
-      const status = row[CONFIG.COLUMNS.STATUS];
-      
-      if (status === "DONE" || String(status).includes("ERROR") || !row[CONFIG.COLUMNS.INPUT]) continue;
+      if (row[CONFIG.COLUMNS.STATUS] === "DONE" || String(row[CONFIG.COLUMNS.STATUS]).includes("ERROR") || !row[CONFIG.COLUMNS.INPUT]) continue;
 
       sheet.getRange(i + 1, CONFIG.COLUMNS.STATUS + 1).setValue("Processing...");
       SpreadsheetApp.flush();
@@ -222,34 +263,21 @@ function main() {
         const inputString = String(row[CONFIG.COLUMNS.INPUT]); 
         const contactId = row[CONFIG.COLUMNS.ID];
         
-        // 1. PARSE
         const profile = parseAndCalculateProfile(inputString);
-        
-        // 2. GENERATE
         const reportResult = generateFullReport(profile, KEYS.GEMINI);
-        
-        // 3. CREATE PDF
         const pdfUrl = createPdf(profile.name, reportResult.text, KEYS.TEMPLATE);
-
-        // 4. SEND
         sendManyChat(contactId, pdfUrl, profile.firstName, KEYS.MANYCHAT);
 
-        // 5. LOG
         const now = new Date();
-        const formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm");
-        
         sheet.getRange(i + 1, CONFIG.COLUMNS.PDF + 1).setValue(pdfUrl);
         sheet.getRange(i + 1, CONFIG.COLUMNS.STATUS + 1).setValue("DONE");
         sheet.getRange(i + 1, CONFIG.COLUMNS.TOKEN + 1).setValue(reportResult.usage); 
-        sheet.getRange(i + 1, CONFIG.COLUMNS.DEBUG + 1).setValue(JSON.stringify(profile));
-        sheet.getRange(i + 1, CONFIG.COLUMNS.DATE + 1).setValue(formattedDate);
+        sheet.getRange(i + 1, CONFIG.COLUMNS.DATE + 1).setValue(Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm"));
         sheet.getRange(i + 1, CONFIG.COLUMNS.VER + 1).setValue(CONFIG.VERSION);
         sheet.getRange(i + 1, CONFIG.COLUMNS.ERROR + 1).setValue(""); 
         
         processedCount++;
-
       } catch (err) {
-        console.error(err);
         sheet.getRange(i + 1, CONFIG.COLUMNS.STATUS + 1).setValue("ERROR");
         sheet.getRange(i + 1, CONFIG.COLUMNS.ERROR + 1).setValue(err.message);
       }
@@ -261,114 +289,60 @@ function main() {
   }
 }
 
-// ==========================================
-// 1. CORE LOGIC ENGINE
-// ==========================================
+// --- HELPER FUNCTIONS FOR ASTROLOGY ---
 
 function parseAndCalculateProfile(rawInput) {
-  const normalized = normalizeInputWithAI(rawInput, CONFIG.GEMINI_MODEL, PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"));
-  
-  const dateStr = normalized.date; 
-  const timeStr = normalized.time; 
-  const gender = normalized.gender; 
-  const name = normalized.name;
-
-  const [year, month, day] = dateStr.split(".").map(Number);
+  const normalized = normalizeInputWithAI(rawInput);
+  const [year, month, day] = normalized.date.split(".").map(Number);
   
   const mongolData = getMongolianYearData(year, month, day);
   const zodiacData = getWesternZodiac(month, day);
-  const timeAnimal = getTimeAnimal(timeStr);
+  const timeAnimal = getTimeAnimal(normalized.time);
   const numerology = calculateNumerology(year, month, day);
-  const transits = calculateTransits(mongolData.animalIndex);
-  const elementRel = analyzeElementalConflict(mongolData.element, zodiacData.element);
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const py1 = calculatePersonalYear(year, month, day, currentYear + 1);
+  const py2 = calculatePersonalYear(year, month, day, currentYear + 2);
+  const py3 = calculatePersonalYear(year, month, day, currentYear + 3);
 
   return {
-    name: name,
-    firstName: name.split(" ")[0],
-    dob: dateStr,
-    tob: timeStr,
-    gender: gender,
-    
-    yearAnimal: mongolData.animal,
-    yearElement: mongolData.element,
-    zodiacSign: zodiacData.name,
-    zodiacElement: zodiacData.element,
-    timeAnimal: timeAnimal,
-    isDoubleAnimal: mongolData.animal === timeAnimal,
-    
-    lifePath: numerology.lifePath,
-    birthDayNum: numerology.birthDay,
-    
-    transit2025: transits.gate1, 
-    transit2026: transits.gate2, 
-    transit2027: transits.gate3, 
-    
-    elementRelationship: elementRel
+    name: normalized.name, firstName: normalized.name === "Та" ? "Та" : normalized.name.split(" ")[0], dob: normalized.date, tob: normalized.time, gender: normalized.gender,
+    yearAnimal: mongolData.animal, yearElement: mongolData.element, zodiacSign: zodiacData.name, zodiacElement: zodiacData.element, timeAnimal: timeAnimal,
+    destinyNumber: numerology.destiny.val, destinyCalc: numerology.destiny.path,
+    soulNumber: numerology.soul.val, soulCalc: numerology.soul.path,
+    innerDesireNumber: numerology.innerDesire.val, innerDesireCalc: numerology.innerDesire.path,
+    goalNumber: numerology.goal.val, goalCalc: numerology.goal.path,
+    py1: { year: currentYear + 1, number: py1.val, calc: py1.path },
+    py2: { year: currentYear + 2, number: py2.val, calc: py2.path },
+    py3: { year: currentYear + 3, number: py3.val, calc: py3.path }
   };
 }
 
-function normalizeInputWithAI(raw, model, key) {
-  const prompt = `
-    TASK: Normalize this input string into JSON.
-    INPUT: "${raw}"
-    REQUIRED JSON FORMAT:
-    {
-      "name": "Full Name",
-      "date": "YYYY.MM.DD", 
-      "time": "HH:MM" OR "Unknown",
-      "gender": "Эрэгтэй" or "Эмэгтэй"
-    }
-    RETURN ONLY JSON.
-  `;
+function normalizeInputWithAI(raw) {
+  const prompt = `TASK: Normalize. INPUT: "${raw}". RULES: Fix typos (1940-2024), Name default "Та", Gender default "Neutral", Time "Unknown" if missing. JSON: {name, date(YYYY.MM.DD), time(HH:MM), gender}`;
   try {
-    const result = callGemini(prompt, key); 
-    const cleanJson = result.text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanJson);
-  } catch (e) {
-    console.error("Normalization Failed", e);
-    const parts = raw.split("-");
-    return {
-      name: parts[0] ? parts[0].trim() : "Unknown",
-      date: parts[1] ? parts[1].trim() : "2000.01.01",
-      time: parts[2] ? parts[2].trim() : "Unknown",
-      gender: parts[3] ? parts[3].trim() : "Эмэгтэй"
-    };
-  }
+    const res = callGemini(prompt, PropertiesService.getScriptProperties().getProperty("GEMINI_API_KEY"));
+    return JSON.parse(res.text.replace(/```json/g, "").replace(/```/g, "").trim());
+  } catch (e) { return { name: "Та", date: "2000.01.01", time: "Unknown", gender: "Neutral" }; }
 }
 
 function getMongolianYearData(year, month, day) {
   const tsDate = CONFIG.TSAGAAN_SAR[year];
-  if (!tsDate) throw new Error(`Year ${year} not in Tsagaan Sar Map`);
-  
+  if (!tsDate) return { animal: "Хулгана", element: "Төмөр", animalIndex: 0 };
   const [tsMonth, tsDay] = tsDate.split("-").map(Number);
-  
-  let trueYear = year;
-  if (month < tsMonth || (month === tsMonth && day < tsDay)) {
-    trueYear = year - 1;
-  }
-
+  let trueYear = (month < tsMonth || (month === tsMonth && day < tsDay)) ? year - 1 : year;
   const animalIndex = (trueYear - 1900) % 12;
-  const animal = CONFIG.ANIMALS[animalIndex];
-  const lastDigit = trueYear % 10;
-  const element = CONFIG.ELEMENTS_BY_LAST_DIGIT[lastDigit];
-
-  return { animal, element, animalIndex, trueYear };
+  return { animal: CONFIG.ANIMALS[animalIndex], element: CONFIG.ELEMENTS_BY_LAST_DIGIT[trueYear % 10], animalIndex, trueYear };
 }
 
 function getWesternZodiac(m, d) {
   const dateNum = m * 100 + d; 
-  
   for (let z of CONFIG.ZODIACS) {
-    const [startM, startD] = z.start.split("-").map(Number);
-    const [endM, endD] = z.end.split("-").map(Number);
-    
-    if (z.name === "Матар") {
-      if (dateNum >= 1222 || dateNum <= 119) return z;
-    } else {
-      const start = startM * 100 + startD;
-      const end = endM * 100 + endD;
-      if (dateNum >= start && dateNum <= end) return z;
-    }
+    const [sm, sd] = z.start.split("-").map(Number);
+    const [em, ed] = z.end.split("-").map(Number);
+    const s = sm * 100 + sd, e = em * 100 + ed;
+    if (z.name === "Матар") { if (dateNum >= 1222 || dateNum <= 119) return z; }
+    else { if (dateNum >= s && dateNum <= e) return z; }
   }
   return { name: "Тодорхойгүй", element: "Тодорхойгүй" };
 }
@@ -376,254 +350,99 @@ function getWesternZodiac(m, d) {
 function getTimeAnimal(timeStr) {
   if (!timeStr || timeStr.toLowerCase().includes("unknown") || timeStr === "Тодорхойгүй") return "Тодорхойгүй";
   const hour = parseInt(timeStr.split(":")[0], 10);
-  
   if (hour >= 23 || hour < 1) return "Хулгана";
-  if (hour >= 1 && hour < 3) return "Үхэр";
-  if (hour >= 3 && hour < 5) return "Бар";
-  if (hour >= 5 && hour < 7) return "Туулай";
-  if (hour >= 7 && hour < 9) return "Луу";
-  if (hour >= 9 && hour < 11) return "Могой";
-  if (hour >= 11 && hour < 13) return "Морь";
-  if (hour >= 13 && hour < 15) return "Хонь";
-  if (hour >= 15 && hour < 17) return "Бич";
-  if (hour >= 17 && hour < 19) return "Тахиа";
-  if (hour >= 19 && hour < 21) return "Нохой";
-  if (hour >= 21 && hour < 23) return "Гахай";
-  return "Тодорхойгүй";
+  return ["Үхэр", "Бар", "Туулай", "Луу", "Могой", "Морь", "Хонь", "Бич", "Тахиа", "Нохой", "Гахай"][Math.floor((hour - 1) / 2)] || "Хулгана";
 }
 
 function calculateNumerology(y, m, d) {
-  function sumDigits(n) {
-    return String(n).split('').reduce((a, b) => a + Number(b), 0);
-  }
-  
-  function reduceToMaster(n) {
-    if (n === 11 || n === 22 || n === 33) return n;
-    if (n < 10) return n;
-    return reduceToMaster(sumDigits(n));
-  }
-  const total = sumDigits(y) + sumDigits(m) + sumDigits(d);
-  const lifePath = reduceToMaster(total); 
-  const birthDay = d; 
-  return { lifePath, birthDay };
-}
-
-function calculateTransits(birthIdx) {
-  const startYear = 2026;
-  const startAnimalIdx = 6; // Horse
-  
-  let gates = [];
-  
-  for (let i = 0; i < 12; i++) {
-    let currentYear = startYear + i;
-    let currentAnimalIdx = (startAnimalIdx + i) % 12;
-    let animalName = CONFIG.ANIMALS[currentAnimalIdx];
-    let diff = (currentAnimalIdx - birthIdx + 12) % 12;
-    let status = "";
-    let isGolden = false;
-
-    if (diff === 0) { status = "Өөрийн жил (Jupiter Return)"; isGolden = true; }
-    else if (diff === 4 || diff === 8) { status = "Их Ивээл (Алтан Хаалга)"; isGolden = true; }
-    else if (diff === 6) { status = "Харш (Сорилт)"; } 
-    else if (diff === 3) { status = "Түнш (Ивээл)"; isGolden = true; } 
-    
-    if (isGolden || i === 0) { 
-       gates.push({ year: currentYear, animal: animalName, status: status || "Хэвийн (Бэлтгэл үе)" });
-    }
-  }
-
+  function sum(n) { return String(n).split('').reduce((a, b) => a + Number(b), 0); }
+  function red(n) { if (isNaN(n)) return 0; if (n === 11 || n === 22 || n === 33 || n < 10) return n; return red(sum(n)); }
+  const dob = `${y}${m < 10 ? '0'+m : m}${d < 10 ? '0'+d : d}`;
+  const des = red(dob.split('').reduce((a, b) => a + Number(b), 0));
+  const soul = red(d);
+  const inn = red(red(m) + red(d));
+  const goal = red(des + soul);
   return {
-    gate1: gates[0] ? `${gates[0].year} (${gates[0].animal}) - ${gates[0].status}` : "2026 (Морь) - Хэвийн",
-    gate2: gates[1] ? `${gates[1].year} (${gates[1].animal}) - ${gates[1].status}` : "2027 (Хонь) - Хэвийн",
-    gate3: gates[2] ? `${gates[2].year} (${gates[2].animal}) - ${gates[2].status}` : "2028 (Бич) - Хэвийн"
+    destiny: { val: des, path: `(${y}.${m}.${d} -> ${des})` },
+    soul: { val: soul, path: `(${d} -> ${soul})` },
+    innerDesire: { val: inn, path: `(${m}+${d} -> ${inn})` },
+    goal: { val: goal, path: `(${des}+${soul} -> ${goal})` }
   };
 }
 
-function analyzeElementalConflict(yearEl, zodiacEl) {
-  if (yearEl === "Усан" && zodiacEl === "Гал") return "Ус Гал хоёрын тэмцэл (Буцалж буй Ус)";
-  if (yearEl === "Гал" && zodiacEl === "Ус") return "Гал Ус хоёрын тэмцэл (Унтарсан Цог)";
-  if (yearEl === zodiacEl) return "Давхар хүч (Тэнцвэртэй)";
-  if ((yearEl === "Модон" && zodiacEl === "Гал") || (yearEl === "Гал" && zodiacEl === "Модон")) return "Гал дээр тос (Дүрэлзсэн Энерги)";
-  return "Холимог Энерги";
+function calculatePersonalYear(y, m, d, cy) {
+  function sum(n) { return String(n).split('').reduce((a, b) => a + Number(b), 0); }
+  function red(n) { if (isNaN(n)) return 0; if (n < 10) return n; return red(sum(n)); }
+  const raw = cy + sum(m) + sum(d);
+  return { val: red(raw), path: `(${cy}+${m}+${d} -> ${red(raw)})` };
 }
-
-// ==========================================
-// 2. GENERATION ENGINE (CONFIG DRIVEN)
-// ==========================================
 
 function generateFullReport(p, apiKey) {
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; 
-  let forecastYear = currentYear;
-  if (currentMonth >= 11) forecastYear = currentYear + 1; 
-  const nextYearAnimal = CONFIG.ANIMALS[(forecastYear - 1900) % 12].toUpperCase(); // Make uppercase
-  
-  // 1. Prepare Replacement Variables
-  // We add logic for optional sections here
-  const timeInfoLine = p.timeAnimal !== "Тодорхойгүй" 
-    ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)` 
-    : "";
-    
-  const timeAnalysisInstructions = p.timeAnimal !== "Тодорхойгүй"
-    ? `- Analyze ${p.timeAnimal} birth hour influence on their hidden self.`
-    : "(User does not know birth time, so SILENTLY SKIP the birth hour section. Do NOT mention that the time is unknown. Just move to the next topic naturally.)";
-
-  // The map of {{variables}} to values
-  const replacements = {
-    "{{name}}": p.name,
-    "{{dob}}": p.dob,
-    "{{yearElement}}": p.yearElement,
-    "{{yearAnimal}}": p.yearAnimal,
-    "{{zodiacElement}}": p.zodiacElement,
-    "{{zodiacSign}}": p.zodiacSign,
-    "{{tob}}": p.tob,
-    "{{timeAnimal}}": p.timeAnimal,
-    "{{lifePath}}": p.lifePath,
-    "{{birthDayNum}}": p.birthDayNum,
-    "{{elementRelationship}}": p.elementRelationship,
-    "{{gender}}": p.gender,
-    "{{transit1}}": p.transit2025,
-    "{{transit2}}": p.transit2026,
-    "{{transit3}}": p.transit2027,
-    "{{forecastYear}}": forecastYear,
-    "{{nextYearAnimal}}": nextYearAnimal,
-    "{{timeInfoLine}}": timeInfoLine,
-    "{{timeAnalysisInstructions}}": timeAnalysisInstructions
+  const tpl = CONFIG.AI_SETTINGS.PROMPTS;
+  const f = (t) => {
+    let r = t;
+    const map = {
+      "{{name}}": p.name, "{{dob}}": p.dob, "{{yearAnimal}}": p.yearAnimal, "{{zodiacSign}}": p.zodiacSign,
+      "{{destinyNumber}}": p.destinyNumber, "{{destinyCalc}}": p.destinyCalc, "{{py1}}": p.py1.number, "{{py1Calc}}": p.py1.calc,
+      "{{soulNumber}}": p.soulNumber, "{{soulCalc}}": p.soulCalc, "{{innerDesireNumber}}": p.innerDesireNumber, "{{innerDesireCalc}}": p.innerDesireCalc,
+      "{{goalNumber}}": p.goalNumber, "{{goalCalc}}": p.goalCalc,
+      "{{year2}}": p.py2.year, "{{py2}}": p.py2.number, "{{py2Calc}}": p.py2.calc,
+      "{{year3}}": p.py3.year, "{{py3}}": p.py3.number, "{{py3Calc}}": p.py3.calc,
+      "{{timeInfoLine}}": p.timeAnimal !== "Тодорхойгүй" ? `🕰️ **Төрсөн цаг:** ${p.tob} (${p.timeAnimal} цаг)` : "",
+      "{{timeAnalysisInstructions}}": p.timeAnimal !== "Тодорхойгүй" ? `- Analyze ${p.timeAnimal} birth hour.` : "(Skip time analysis)."
+    };
+    for (const [k,v] of Object.entries(map)) r = r.split(k).join(v);
+    return r;
   };
 
-  // 2. Build System Prompt (Role + Core Rules + User Profile)
-  const systemPrompt = `
-    ROLE: ${CONFIG.AI_SETTINGS.ROLE}
-    TONE: ${CONFIG.AI_SETTINGS.TONE}
-    
-    CORE RULES:
-    ${CONFIG.AI_SETTINGS.CORE_RULES}
-    
-    USER PROFILE:
-    - Name: ${p.name}
-    - Gender: ${p.gender}
-    - Year: ${p.yearElement} ${p.yearAnimal}
-    - Zodiac: ${p.zodiacSign} (${p.zodiacElement})
-    - Birth Time: ${p.tob} (${p.timeAnimal})
-    - Life Path: ${p.lifePath}
-    - Transits: ${p.transit2025} | ${p.transit2026}
-  `;
-
-  // 3. Helper to replace placeholders
-  const fill = (template) => {
-    let result = template;
-    for (const [key, val] of Object.entries(replacements)) {
-      result = result.split(key).join(val); // Global replace
-    }
-    return result;
-  };
-
-  // 4. Execute Prompts
-  const prompt1 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1);
-  const r1 = callGemini(prompt1, apiKey);
-
-  const prompt2 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2);
-  const r2 = callGemini(prompt2, apiKey);
-
-  const prompt3 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3);
-  const r3 = callGemini(prompt3, apiKey);
-
-  return {
-    text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text,
-    usage: r1.usage + r2.usage + r3.usage
-  };
+  const sys = `ROLE: ${CONFIG.AI_SETTINGS.ROLE}\nUSER: ${JSON.stringify(p)}`;
+  const r1 = callGemini(sys + f(tpl.PART_1), apiKey);
+  const r2 = callGemini(sys + f(tpl.PART_2), apiKey);
+  const r3 = callGemini(sys + f(tpl.PART_3), apiKey);
+  return { text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text, usage: r1.usage + r2.usage + r3.usage };
 }
 
 function callGemini(text, key) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${key}`;
-  const payload = {
-    contents: [{ parts: [{ text: text }] }],
-    generationConfig: { temperature: CONFIG.TEMPERATURE, maxOutputTokens: 8192 }
-  };
-  
-  const options = {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  
-  const res = UrlFetchApp.fetch(url, options);
+  const payload = { contents: [{ parts: [{ text: text }] }] };
+  const res = UrlFetchApp.fetch(url, { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true });
   const json = JSON.parse(res.getContentText());
-  
-  if (json.error) throw new Error("Gemini Error: " + json.error.message);
-  
-  const content = (json.candidates && json.candidates[0].content) ? json.candidates[0].content.parts[0].text : "Error generating text.";
-  const usage = (json.usageMetadata && json.usageMetadata.totalTokenCount) ? json.usageMetadata.totalTokenCount : 0;
-
-  return { text: content, usage: usage };
+  if (json.error) return { text: "Error", usage: 0 };
+  return { text: json.candidates[0].content.parts[0].text, usage: json.usageMetadata ? json.usageMetadata.totalTokenCount : 0 };
 }
-
-// ==========================================
-// 3. PDF & DELIVERY
-// ==========================================
 
 function createPdf(name, content, templateId) {
-  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Astro Report`);
+  const copy = DriveApp.getFileById(templateId).makeCopy(`${name} - Report`);
   const doc = DocumentApp.openById(copy.getId());
   const body = doc.getBody();
-
-  let cleanText = content
-    .replace(/```.*?```/gs, "")
-    .replace(/^###\s/gm, "")          
-    .replace(/^##\s/gm, "")
-    .replace(/^\s*[\*\-]\s+/gm, "") 
-    .trim();
+  let clean = content.replace(/```.*?```/gs, "").replace(/^\s*[\*\-]\s+/gm, "").trim();
+  body.replaceText("{{NAME}}", name); body.replaceText("{{REPORT}}", clean);
   
-  body.replaceText("{{NAME}}", name);
-  body.replaceText("{{REPORT}}", cleanText);
-  body.replaceText("{{report}}", cleanText);
-  
-  processMarkdownBold(body);
-
-  doc.saveAndClose();
-  
-  const pdf = copy.getAs(MimeType.PDF);
-  const folder = DriveApp.getFolderById("1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j");
-  const pdfFile = folder.createFile(pdf); 
-  
-  pdfFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  copy.setTrashed(true);
-  
-  return pdfFile.getUrl();
-}
-
-function processMarkdownBold(body) {
-  var foundElement = body.findText("\\*\\*(.*?)\\*\\*");
+  // Bold formatting
+  let foundElement = body.findText("\\*\\*(.*?)\\*\\*");
   while (foundElement != null) {
-    var foundText = foundElement.getElement().asText();
-    var start = foundElement.getStartOffset();
-    var end = foundElement.getEndOffsetInclusive();
+    let foundText = foundElement.getElement().asText();
+    let start = foundElement.getStartOffset();
+    let end = foundElement.getEndOffsetInclusive();
     foundText.setBold(start, end, true);
     foundText.deleteText(start, start + 1);
     foundText.deleteText(end - 3, end - 2);
     foundElement = body.findText("\\*\\*(.*?)\\*\\*");
   }
+
+  doc.saveAndClose();
+  const pdf = copy.getAs(MimeType.PDF);
+  // NOTE: Replace this ID with your actual folder ID
+  const folder = DriveApp.getFolderById("1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j");
+  const file = folder.createFile(pdf);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  copy.setTrashed(true);
+  return file.getUrl();
 }
 
 function sendManyChat(subscriberId, pdfUrl, name, token) {
   const msg = CONFIG.DELIVERY_MESSAGE.replace("{{NAME}}", name).replace("{{URL}}", pdfUrl);
   const url = "https://api.manychat.com/fb/sending/sendContent";
-  const payload = {
-    "subscriber_id": String(subscriberId).trim(),
-    data: {
-      version: "v2",
-      content: { messages: [{ type: "text", text: msg }] }
-    }
-  };
-  const options = {
-    method: "post",
-    headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" },
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-  const res = UrlFetchApp.fetch(url, options);
-  const json = JSON.parse(res.getContentText());
-  if (json.status !== "success") throw new Error("ManyChat Error: " + JSON.stringify(json));
+  const payload = { subscriber_id: String(subscriberId).trim(), data: { version: "v2", content: { messages: [{ type: "text", text: msg }] } } };
+  UrlFetchApp.fetch(url, { method: "post", headers: { Authorization: "Bearer " + token, "Content-Type": "application/json" }, payload: JSON.stringify(payload) });
 }
