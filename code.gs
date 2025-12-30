@@ -114,7 +114,6 @@ const CONFIG = {
 
       PART_2: `
       CONTEXT: Use DATA: {{jsonProfile}}
-      PREVIOUS CHAPTER (For Flow): {{prevText}}
 
       **💞 БҮЛЭГ 2. ЗАЯАНЫ ХАНИЙН ПРОФАЙЛ**
 
@@ -140,7 +139,6 @@ const CONFIG = {
 
       PART_3: `
       CONTEXT: Use DATA: {{jsonProfile}}
-      PREVIOUS CHAPTER (For Flow): {{prevText}}
       FOCUS: South Node is {{southNode}}.
 
       **⚠️ БҮЛЭГ 3. ХАЙРЫН КАРМА: ТАНЫ ДАВТАХ ЁСГҮЙ АЛДАА**
@@ -162,7 +160,6 @@ const CONFIG = {
 
       PART_4: `
       CONTEXT: Use DATA: {{jsonProfile}}
-      PREVIOUS CHAPTER (For Flow): {{prevText}}
       YEARS: {{currentYear}}, {{nextYear}}
 
       **⏳ БҮЛЭГ 4. УЧРАЛЫН ЦАГ ХУГАЦАА: КАРМЫН ШАЛГАЛТ**
@@ -426,11 +423,14 @@ function generateFullReport(p, apiKey) {
     return result;
   };
 
-  // CHAINING REQUESTS (Sending Previous Text for Continuity)
+  // INDEPENDENT REQUESTS (Optimized for Tokens)
+  // We send only the profile data, not the previous text.
+  // This reduces token usage significantly (from ~30k to ~15k).
+
   const r1 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1, ""), apiKey);
-  const r2 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2, r1.text), apiKey);
-  const r3 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3, r2.text), apiKey);
-  const r4 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_4, r3.text), apiKey);
+  const r2 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2, ""), apiKey); // No Prev Text
+  const r3 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3, ""), apiKey); // No Prev Text
+  const r4 = callGemini(systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_4, ""), apiKey); // No Prev Text
 
   return {
     text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text + "\n\n" + r4.text,
