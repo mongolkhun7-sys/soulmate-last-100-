@@ -13,6 +13,7 @@ const CONFIG = {
   BATCH_SIZE: 3, 
   GEMINI_MODEL: "gemini-2.5-flash", 
   TEMPERATURE: 0.8, 
+  FOLDER_ID: "1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j", // Output folder for PDFs
 
   // --- COLUMN MAPPING (0-based) ---
   COLUMNS: {
@@ -585,7 +586,7 @@ function createPdf(name, content, templateId) {
   doc.saveAndClose();
   
   const pdf = copy.getAs(MimeType.PDF);
-  const folder = DriveApp.getFolderById("1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j");
+  const folder = DriveApp.getFolderById(CONFIG.FOLDER_ID);
   const pdfFile = folder.createFile(pdf); 
   
   pdfFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
