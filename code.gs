@@ -1,13 +1,13 @@
 /****************************************************************************************
- * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v7.0 - MASTER CONTEXT)
- * VERSION: v7.0 - Context Chaining & Deep Karma Analysis
+ * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v8.0 - VISUAL MASTER)
+ * VERSION: v8.0 - Emojis, Perfect Bold, Monglification
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v7.0-MasterContext",
+  VERSION: "v8.0-VisualMaster",
   PRODUCT_NAME: "Хайрын Карма & Заяаны Хань - Дэлгэрэнгүй Тайлан",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
@@ -35,13 +35,13 @@ const CONFIG = {
     You are an expert Mongolian Astrologer. Write a deep, connected, book-like report.
 
     STRICT RULES:
-    1. **NO META-TALK:** Never say "Here is Part 2", "Continuing...", "Understood". Just write the report content.
-    2. **VOCABULARY:** Use 'Орд' (Ord), 'Нум' (Num), 'Мандах орд'. NO 'Знак', 'Харваач'.
+    1. **LANGUAGE:** Write in MONGOLIAN. Use Mongolian terms for Signs (e.g., Хонь, not Aries).
+    2. **NO META-TALK:** Never say "Here is Part 2". Write ONLY the report content.
     3. **CONNECTION:** Reference the user's previous chapters to ensure flow.
-    4. **TONE:** Professional, empathetic, direct. No flowery greetings like "Dear brother".
+    4. **TONE:** Professional, empathetic, direct.
     `,
 
-    // Calculation Prompt (Unchanged)
+    // Calculation Prompt
     CALCULATION_PROMPT: `
     TASK: Calculate Astrological Chart.
     INPUT: Name:{{name}}, Date:{{dob}}, Time:{{tob}}, Place:{{place}}, Moon:{{mathMoon}}, Nodes:{{mathNorthNode}}/{{mathSouthNode}}
@@ -49,32 +49,32 @@ const CONFIG = {
     RETURN JSON: { "sun": "Sign", "moon": "Sign", "rising": "Sign", "lifePath": "Num", "isMasterNumber": bool, "elements": {"dominant": "El", "missing": "El"}, "seventhHouse": {"sign": "Sign", "ruler": "Planet"}, "nodes": {"north": "Sign", "south": "Sign"} }
     `,
 
-    // --- CHAPTER PROMPTS (With Context Injection) ---
+    // --- CHAPTER PROMPTS (Added Emojis & Bold Markers) ---
     PROMPTS: {
       PART_1: `
       CONTEXT: Use DATA: {{jsonProfile}}
       
-      **БҮЛЭГ 1. ТАНЫ ЭНЕРГИЙН КОД**
+      **🔮 БҮЛЭГ 1. ТАНЫ ЭНЕРГИЙН КОД**
       
-      **1.1 ТАНЫ ЭНЕРГИЙН БҮТЭЦ: ГУРВАН ТУЛГУУР БАГАНА**
+      **✨ 1.1 ТАНЫ ЭНЕРГИЙН БҮТЭЦ: ГУРВАН ТУЛГУУР БАГАНА**
 
-      **НАР (Ухамсар): {{sun}} Орд**
+      **☀️ НАР (Ухамсар): {{sun}} Орд**
       *Нар бол таны мөн чанар, "Би хэн бэ?" гэдгийг тодорхойлогч гол эрхэс юм.*
-      Таны Нар {{sun}} ордод байрласан тул... (Explain Ego/Core).
+      Таны Нар {{sun}} ордод байрласан тул... (Explain Ego).
 
-      **САР (Сэтгэл хөдлөл): {{moon}} Орд**
+      **🌙 САР (Сэтгэл хөдлөл): {{moon}} Орд**
       *Сар бол таны далд ертөнц, сэтгэл хөдлөл, дотоод хэрэгцээг илэрхийлдэг.*
       Таны Сар {{moon}} ордод байрласнаар... (Explain Emotions).
 
-      **МАНДАХ ОРД (Гадаад төрх): {{rising}} Орд**
+      **🌅 МАНДАХ ОРД (Гадаад төрх): {{rising}} Орд**
       *Мандах орд бол таны "Нийгмийн баг" буюу бусдад харагдах төрх юм.*
       Таныг төрөх үед {{rising}} орд мандаж байсан тул... (Explain Mask).
 
-      **1.2 ТАНЫ "ЧИГЛЭЛ": АМЬДРАЛЫН ЗАМ**
+      **🔢 1.2 ТАНЫ "ЧИГЛЭЛ": АМЬДРАЛЫН ЗАМ**
       *Амьдралын зам нь таны энэ амьдралд биелүүлэх үүрэг, хувь тавиланг заадаг.*
       Таны тоо бол {{lifePath}}. (Master Number: {{isMasterNumber}}). (Explain Destiny).
 
-      **1.3 ЭНЕРГИЙН ТЭНЦВЭРИЙН ОНОШЛОГОО**
+      **⚖️ 1.3 ЭНЕРГИЙН ТЭНЦВЭРИЙН ОНОШЛОГОО**
       - Analyze Element Balance. Give practical advice.
       `,
 
@@ -82,25 +82,25 @@ const CONFIG = {
       CONTEXT: Use DATA: {{jsonProfile}}
       PREVIOUS CHAPTER (For Flow): {{prevText}}
 
-      **БҮЛЭГ 2. ЗАЯАНЫ ХАНИЙН ПРОФАЙЛ**
+      **💞 БҮЛЭГ 2. ЗАЯАНЫ ХАНИЙН ПРОФАЙЛ**
 
-      **2.1 ОГТОРГУЙН ЗОХИЦОЛ**
+      **🌌 2.1 ОГТОРГУЙН ЗОХИЦОЛ**
       *Зурхайн 7-р гэр нь таныг нөхөх энергийг заадаг.*
-      Таны Мандах орд {{rising}} тул 7-р гэр тань {{seventhHouseSign}}-д байна. Энэ нь... (Explain opposite energy need).
+      Таны Мандах орд {{rising}} тул 7-р гэр тань {{seventhHouseSign}}-д байна. Энэ нь... (Explain opposite energy).
 
-      **2.2 ТАНЫГ НӨХӨХ ДҮР БУЮУ ЗАЯА ХАНИЙН ШИНЖ**
+      **👤 2.2 ТАНЫГ НӨХӨХ ДҮР БУЮУ ЗАЯА ХАНИЙН ШИНЖ**
       - Describe partner ({{seventhHouseRuler}} & {{seventhHouseSign}}).
 
-      **2.3 МАГАДЛАЛТАЙ МЭРГЭЖИЛ БА ГАДААД ТӨРХ**
+      **💼 2.3 МАГАДЛАЛТАЙ МЭРГЭЖИЛ БА ГАДААД ТӨРХ**
       - Career and Appearance.
 
-      **2.4 САНХҮҮГИЙН ЧАДАМЖ**
+      **💰 2.4 САНХҮҮГИЙН ЧАДАМЖ**
       - Financial potential.
 
-      **2.5 ТАНИХ ТЭМДЭГ: ЭЕРЭГ ДОХИО**
+      **✅ 2.5 ТАНИХ ТЭМДЭГ: ЭЕРЭГ ДОХИО**
       - 3 Green Flags.
 
-      **2.6 УЧРАЛЫН ГАЗАР БА ОРЧИН**
+      **📍 2.6 УЧРАЛЫН ГАЗАР БА ОРЧИН**
       - 3 Specific locations based on 7th House Ruler.
       `,
 
@@ -109,21 +109,21 @@ const CONFIG = {
       PREVIOUS CHAPTER (For Flow): {{prevText}}
       FOCUS: South Node is {{southNode}}.
 
-      **БҮЛЭГ 3. ХАЙРЫН КАРМА: ТАНЫ ДАВТАХ ЁСГҮЙ АЛДАА**
+      **⚠️ БҮЛЭГ 3. ХАЙРЫН КАРМА: ТАНЫ ДАВТАХ ЁСГҮЙ АЛДАА**
 
-      **3.1 - 3.3 КАРМЫН БАГШ НАР**
+      **🚫 3.1 - 3.3 КАРМЫН БАГШ НАР**
       *Сарны Өмнөд Зангилаа ({{southNode}}) нь таны өнгөрсөн амьдралын дадал зуршил, гацдаг цэгийг харуулна.*
       Таны амьдралд давтагддаг "Кармын Багш" нар буюу зайлсхийх ёстой 3 төрлийн хүн:
 
-      1. **[Type Name]:** (Description of trait).
-         - **Нөлөө:** (How they hurt/manipulate you specifically. e.g., "They leave you without closure", "They make you feel small").
-         - **Сургамж:** (What you must learn).
+      1. **[Type Name]:** (Description).
+         - **Нөлөө:** (How they hurt you).
+         - **Сургамж:** (Lesson).
 
       2. **[Type Name]:** ...
       3. **[Type Name]:** ...
 
-      **3.4 ОНЦГОЙ НӨЛӨӨЛӨЛ (Сэтгэл зүйн урхи)**
-      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}). Head vs Heart.
+      **🌀 3.4 ОНЦГОЙ НӨЛӨӨЛӨЛ (Сэтгэл зүйн урхи)**
+      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}).
       `,
 
       PART_4: `
@@ -131,14 +131,14 @@ const CONFIG = {
       PREVIOUS CHAPTER (For Flow): {{prevText}}
       YEARS: {{currentYear}}, {{nextYear}}
 
-      **БҮЛЭГ 4. УЧРАЛЫН ЦАГ ХУГАЦАА: КАРМЫН ШАЛГАЛТ**
+      **⏳ БҮЛЭГ 4. УЧРАЛЫН ЦАГ ХУГАЦАА: КАРМЫН ШАЛГАЛТ**
 
-      **4.1 ЦЭВЭРЛЭГЭЭНИЙ ЖИЛ ({{currentYear}} он)**
-      - Advice for {{currentYear}}. How to prepare?
+      **🧹 4.1 ЦЭВЭРЛЭГЭЭНИЙ ЖИЛ ({{currentYear}} он)**
+      - Advice for {{currentYear}}.
 
-      **4.2 ИХ АЗ ЖАРГАЛЫН МӨЧЛӨГ ({{nextYear}} он)**
+      **🍀 4.2 ИХ АЗ ЖАРГАЛЫН МӨЧЛӨГ ({{nextYear}} он)**
       *Бархасбадь гараг нь 12 жилд нэг удаа таны хайрын гэрийг ивээдэг.*
-      - Prediction for {{nextYear}} when Jupiter enters/transits {{seventhHouseSign}} (or relevant aspect).
+      - Prediction for {{nextYear}} when Jupiter enters/transits {{seventhHouseSign}}.
       `
     }
   },
@@ -187,7 +187,7 @@ function main() {
         // 2. GENERATE REPORT (Chained)
         const reportResult = generateFullReport(profile, KEYS.GEMINI);
         
-        // 3. CREATE PDF
+        // 3. CREATE PDF (With Translation & Formatting)
         const pdfUrl = createPdf(profile.name, reportResult.text, KEYS.TEMPLATE);
 
         // 4. SEND
@@ -378,7 +378,10 @@ function createPdf(name, content, templateId) {
   const doc = DocumentApp.openById(copy.getId());
   const body = doc.getBody();
 
-  let cleanText = content
+  // 1. TRANSLATE TO MONGOLIAN (Post-Processing)
+  let processedText = translateAstrologyTerms(content);
+
+  let cleanText = processedText
     .replace(/```.*?```/gs, "")
     .replace(/^###\s/gm, "")          
     .replace(/^##\s/gm, "")
@@ -389,6 +392,7 @@ function createPdf(name, content, templateId) {
   body.replaceText("{{REPORT}}", cleanText);
   body.replaceText("{{report}}", cleanText);
   
+  // 2. PERFECT BOLD LOGIC
   processMarkdownBold(body);
 
   doc.saveAndClose();
@@ -400,15 +404,44 @@ function createPdf(name, content, templateId) {
   return pdfFile.getUrl();
 }
 
+// --- HELPER: MONGOLIAN TRANSLATION MAP ---
+function translateAstrologyTerms(text) {
+  const dict = {
+    "Aries": "Хонь", "Taurus": "Үхэр", "Gemini": "Ихэр", "Cancer": "Мэлхий",
+    "Leo": "Арслан", "Virgo": "Охин", "Libra": "Жинлүүр", "Scorpio": "Хилэнц",
+    "Sagittarius": "Нум", "Capricorn": "Матар", "Aquarius": "Хумх", "Pisces": "Загас",
+    "Sun": "Нар", "Moon": "Сар", "Jupiter": "Бархасбадь", "Venus": "Сугар",
+    "Mars": "Ангараг", "Mercury": "Буд", "Saturn": "Санчир"
+  };
+
+  let translated = text;
+  for (const [eng, mon] of Object.entries(dict)) {
+    // Regex matches "Aries" whole word case insensitive, replaces with "Хонь"
+    const regex = new RegExp(`\\b${eng}\\b`, "gi");
+    translated = translated.replace(regex, mon);
+  }
+  return translated;
+}
+
+// --- HELPER: ROBUST BOLD PROCESSING ---
 function processMarkdownBold(body) {
+  // Finds **Word** pattern. Works even if there are emojis.
   var foundElement = body.findText("\\*\\*(.*?)\\*\\*");
+
   while (foundElement != null) {
     var foundText = foundElement.getElement().asText();
     var start = foundElement.getStartOffset();
     var end = foundElement.getEndOffsetInclusive();
+
+    // Apply Bold
     foundText.setBold(start, end, true);
+
+    // Delete the asterisks (** at start, ** at end)
+    // We delete end first to keep start index valid
+    foundText.deleteText(end - 1, end);
     foundText.deleteText(start, start + 1);
-    foundText.deleteText(end - 3, end - 2);
+
+    // Search for NEXT occurrence
     foundElement = body.findText("\\*\\*(.*?)\\*\\*");
   }
 }
