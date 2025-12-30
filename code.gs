@@ -1,18 +1,18 @@
 /****************************************************************************************
- * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v5.0 - PRO)
- * VERSION: v5.0 - Math Enhanced & Configurable
+ * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v6.0 - FINAL POLISHED)
+ * VERSION: v6.0 - Math Nodes, Natural Language, & Educational Intros
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v5.0-ProMath",
+  VERSION: "v6.0-FinalPolished",
   PRODUCT_NAME: "Хайрын Карма & Заяаны Хань - Дэлгэрэнгүй Тайлан",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.5, // Lower temperature for more factual astrological output
+  TEMPERATURE: 0.6, // Slightly higher for more natural, non-robotic flow
 
   // ⚙️ CONFIGURATION (EDIT THIS SECTION)
   FOLDER_ID: "1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j", // Replace with your Google Drive Folder ID
@@ -40,13 +40,20 @@ const CONFIG = {
   // ==================================================================================
   
   AI_SETTINGS: {
-    ROLE: "You are a mystical yet analytical Astrologer. You use the provided CALCULATED DATA (Moon, Sun) as absolute truth. Your writing style is deep, direct, and empathetic (Mongolian).",
+    ROLE: `
+    You are an expert Mongolian Astrologer and Psychologist.
+    Your goal is to write a deeply personal, accurate, and educational report.
 
-    // Hardcoded context for Future Predictions (Chapter 4)
-    CURRENT_CONTEXT: "Current Astrological Era (For Chapter 4): Jupiter is in CANCER (Мэлхий). North Node is in PISCES (Загас). Saturn is in ARIES (Хонь). Use this for forecasting.",
+    CRITICAL RULES:
+    1. **VOCABULARY:** NEVER use 'Знак' (Znak), 'Харваач' (Harvaach), 'Асцендент'.
+       - USE: 'Орд' (Ord), 'Нум' (Num), 'Мандах орд' (Rising).
+       - Always translate planet names: Jupiter -> Бархасбадь, Venus -> Сугар, Mars -> Ангараг, Mercury -> Буд, Saturn -> Санчир.
+    2. **TONE:** Avoid robotic/translated phrases like "Сэтгэл санаа өргөн цар хүрээтэй".
+       - USE Natural Mongolian: "Сэтгэл санаа уужуу тайван", "Алитыг том зургаар хардаг".
+    3. **TRUTH:** Use the provided CALCULATED DATA (Moon, Nodes) as absolute fact. Do not recalculate.
+    `,
 
     // This prompt calculates the "Truth" (Planetary Positions) before writing.
-    // Note: We inject the MATH-CALCULATED Moon sign into this prompt to guide the AI.
     CALCULATION_PROMPT: `
     TASK: Calculate the Astrological Chart.
     INPUT:
@@ -55,14 +62,15 @@ const CONFIG = {
     - Time: {{tob}}
     - Place: {{place}}
     - CALCULATED MOON SIGN: {{mathMoon}} (TRUST THIS!)
+    - CALCULATED NODES: North={{mathNorthNode}}, South={{mathSouthNode}} (TRUST THIS!)
     
     INSTRUCTIONS:
     1. Sun Sign: Calculate based on Date.
-    2. Moon Sign: USE THE PROVIDED 'CALCULATED MOON SIGN' ({{mathMoon}}). Do not guess.
+    2. Moon Sign: USE THE PROVIDED 'CALCULATED MOON SIGN'.
     3. Rising Sign (Ascendant): Estimate based on Time {{tob}} and Sun Sign.
-    4. 7th House: It is the Opposite Sign of the Rising Sign.
-    5. Jupiter & Nodes: Estimate based on birth year.
-    
+    4. 7th House: Opposite of Rising Sign.
+    5. Nodes: USE THE PROVIDED 'CALCULATED NODES'.
+
     RETURN ONLY JSON:
     {
       "sun": "SignName",
@@ -72,11 +80,11 @@ const CONFIG = {
       "isMasterNumber": boolean,
       "elements": { "dominant": "Element", "missing": "Element" },
       "seventhHouse": { "sign": "SignName", "ruler": "PlanetName" },
-      "nodes": { "north": "SignName", "south": "SignName" }
+      "nodes": { "north": "{{mathNorthNode}}", "south": "{{mathSouthNode}}" }
     }
     `,
 
-    // --- CHAPTER PROMPTS (Strict Structure) ---
+    // --- CHAPTER PROMPTS ---
     PROMPTS: {
       PART_1: `
       CONTEXT: Use this DATA: {{jsonProfile}}
@@ -84,19 +92,27 @@ const CONFIG = {
       **БҮЛЭГ 1. ТАНЫ ЭНЕРГИЙН КОД**
       
       **1.1 ТАНЫ ЭНЕРГИЙН БҮТЭЦ: ГУРВАН ТУЛГУУР БАГАНА**
-      - **НАР (Ухамсар):** {{sun}} орд. (Describe Ego & Core Self).
-      - **САР (Сэтгэл хөдлөл):** {{moon}} орд. (Describe Inner Emotions).
-      - **МАНДАХ ОРД (Гадаад төрх):** {{rising}} орд. (Describe Social Mask).
+
+      **НАР (Ухамсар): {{sun}} Орд**
+      *Боловсрол:* Нар бол таны мөн чанар, "Би хэн бэ?" гэдгийг тодорхойлогч гол эрхэс юм. Энэ нь таны амьдралын зорилго, ертөнцийг үзэх үзлийн суурийг тавьдаг.
+      *Тайлбар:* Таны Нар {{sun}} ордод байрласан тул... (Describe Ego).
+
+      **САР (Сэтгэл хөдлөл): {{moon}} Орд**
+      *Боловсрол:* Сар бол таны далд ертөнц, сэтгэл хөдлөл, хүмүүст тэр бүр харагддаггүй дотоод хэрэгцээг илэрхийлдэг.
+      *Тайлбар:* Таны Сар {{moon}} ордод байрласнаар... (Describe Inner Emotions naturally).
+
+      **МАНДАХ ОРД (Гадаад төрх): {{rising}} Орд**
+      *Боловсрол:* Мандах орд бол таны "Нийгмийн баг" буюу бусдад анх харагдах төрх, биеийн хэлэмж юм.
+      *Тайлбар:* Таныг төрөх үед тэнгэрийн хаяанд {{rising}} орд мандаж байсан тул... (Describe Persona).
 
       **1.2 ТАНЫ "ЧИГЛЭЛ": АМЬДРАЛЫН ЗАМ**
-      - Life Path Number: {{lifePath}}. (Master Number: {{isMasterNumber}}).
-      - Explain their destiny and purpose.
+      *Боловсрол:* Нумерологийн ухаанд "Амьдралын зам" нь таны энэ амьдралд биелүүлэх ёстой үүрэг, хувь тавиланг заадаг.
+      *Тайлбар:* Таны тоо бол {{lifePath}}. (Master Number: {{isMasterNumber}}). (Explain destiny).
 
       **1.3 ЭНЕРГИЙН ТЭНЦВЭРИЙН ОНОШЛОГОО**
-      - Analyze Element Balance (Dominant vs Missing).
-      - Diagnose what energy they lack and need to balance.
+      - Analyze Element Balance. What energy do they lack? Give practical advice on how to balance it.
 
-      (Write in deep Mongolian. Use Bold Headers.)
+      (Write in natural, flowing Mongolian. No robotic lists.)
       `,
 
       PART_2: `
@@ -106,47 +122,50 @@ const CONFIG = {
       **БҮЛЭГ 2. ЗАЯАНЫ ХАНИЙН ПРОФАЙЛ**
 
       **2.1 ОГТОРГУЙН ЗОХИЦОЛ**
-      - Why they need {{seventhHouseSign}} energy (Opposite of {{rising}}).
+      *Боловсрол:* Зурхайн 7-р гэр нь "Бид" буюу хосын харилцааг илэрхийлдэг. Энэ гэр нь таны Мандах ордны яг эсрэг талд байрладаг тул танд дутагдаж буй энергийг нөхөх хүнийг заадаг.
+      *Тайлбар:* Таны 7-р гэр {{seventhHouseSign}} ордод байгаа тул танд... (Explain opposite energy need).
 
       **2.2 ТАНЫГ НӨХӨХ ДҮР БУЮУ ЗАЯА ХАНИЙН ШИНЖ**
-      - Partner's personality based on {{seventhHouseRuler}} & {{seventhHouseSign}}.
+      - Describe the partner based on {{seventhHouseRuler}} & {{seventhHouseSign}}. (Soft vs Strong, Intellectual vs Emotional).
 
       **2.3 МАГАДЛАЛТАЙ МЭРГЭЖИЛ БА ГАДААД ТӨРХ**
-      - Partner's likely career and appearance.
+      - Career and Appearance prediction.
 
       **2.4 САНХҮҮГИЙН ЧАДАМЖ**
-      - Partner's financial potential (Jupiter logic).
+      - Financial potential analysis.
 
       **2.5 ТАНИХ ТЭМДЭГ: ЭЕРЭГ ДОХИО**
-      - 3 Green Flags to recognize the right person.
+      - 3 Green Flags.
 
       **2.6 УЧРАЛЫН ГАЗАР БА ОРЧИН**
-      - Where to meet? (Based on 7th House ruler). Give 3 specific locations.
+      - 3 Specific locations based on 7th House Ruler.
       `,
 
       PART_3: `
       CONTEXT: Use this DATA: {{jsonProfile}}
-      FOCUS: South Node is in {{southNode}}.
-      CURRENT TRANSITS: ${"{{currentContext}}"}
+      FOCUS: South Node is in {{southNode}}. North Node is in {{northNode}}.
+      CURRENT YEAR: {{currentYear}}
+      NEXT YEAR: {{nextYear}}
 
       **БҮЛЭГ 3. ХАЙРЫН КАРМА: ТАНЫ ДАВТАХ ЁСГҮЙ АЛДАА**
 
       **3.1 - 3.3 КАРМЫН БАГШ НАР**
-      - Analyze South Node in {{southNode}}.
-      - Describe 3 "Toxic Types" they attract (Karmic Teachers).
+      *Боловсрол:* Сарны Өмнөд Зангилаа (South Node) нь таны өнгөрсөн амьдралын дадал зуршил, тав тухтай бүсийг илэрхийлдэг. Бид ихэвчлэн эндээ гацаж, буруу хүмүүсийг татдаг.
+      *Тайлбар:* Таны Өмнөд Зангилаа {{southNode}} ордод байрладаг. Та яагаад дандаа... (Describe toxic patterns).
+      - Describe 3 "Karmic Teachers" (Toxic Types).
 
       **3.4 ОНЦГОЙ НӨЛӨӨЛӨЛ (Сэтгэл зүйн урхи)**
-      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}). Head vs Heart.
+      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}).
 
       **БҮЛЭГ 4. УЧРАЛЫН ЦАГ ХУГАЦАА: КАРМЫН ШАЛГАЛТ**
 
-      **4.1 ЦЭВЭРЛЭГЭЭНИЙ ЖИЛ (Одоо)**
-      - Advice for the current period based on South Node release.
+      **4.1 ЦЭВЭРЛЭГЭЭНИЙ ЖИЛ ({{currentYear}} он)**
+      *Боловсрол:* Шинэ зүйл хүлээж авахын тулд хуучнаа цэвэрлэх ёстой.
+      *Тайлбар:* Энэ онд та... (Preparation advice).
 
-      **4.2 ИХ АЗ ЖАРГАЛЫН МӨЧЛӨГ (Ирээдүй)**
-      - PREDICTION: Jupiter is currently in CANCER (Мэлхий).
-      - Analyze how Jupiter in Cancer affects their 7th House ({{seventhHouseSign}}).
-      - Give a specific timing prediction.
+      **4.2 ИХ АЗ ЖАРГАЛЫН МӨЧЛӨГ ({{nextYear}} он)**
+      *Боловсрол:* Бархасбадь гараг нь "Их Аз Жаргал"-ыг бэлгэддэг бөгөөд 12 жилд нэг удаа таныг ивээдэг.
+      *Тайлбар:* {{nextYear}} онд Бархасбадь Мэлхий (Cancer) ордод байрлах (эсвэл шилжих) үед... (Prediction for {{seventhHouseSign}}).
       `
     }
   },
@@ -233,19 +252,26 @@ function main() {
 function parseAndCalculateProfile(rawInput, apiKey) {
   // 1. Normalize
   const normalized = normalizeInputWithAI(rawInput, CONFIG.GEMINI_MODEL, apiKey);
-  
-  // 2. MATH CALCULATION (Moon Sign)
-  // We use a simplified algorithm to get the Moon Sign without hallucination
   const [year, month, day] = normalized.date.split(".").map(Number);
-  const mathMoonSign = calculateApproxMoonSign(year, month, day);
 
-  // 3. AI Calculation (The rest)
+  // 2. MATH CALCULATION (Moon & Nodes)
+  const mathMoonSign = calculateApproxMoonSign(year, month, day);
+  const mathNodes = calculateApproxNodes(year, month, day);
+
+  // 3. DATE LOGIC
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const nextYear = currentYear + 1;
+
+  // 4. AI Calculation (The rest)
   const calcPrompt = CONFIG.AI_SETTINGS.CALCULATION_PROMPT
     .replace("{{name}}", normalized.name)
     .replace("{{dob}}", normalized.date)
     .replace("{{tob}}", normalized.time)
     .replace("{{place}}", normalized.place)
-    .replace(/{{mathMoon}}/g, mathMoonSign); // INJECT TRUTH
+    .replace(/{{mathMoon}}/g, mathMoonSign)
+    .replace(/{{mathNorthNode}}/g, mathNodes.north)
+    .replace(/{{mathSouthNode}}/g, mathNodes.south);
 
   let astroData = {};
   try {
@@ -257,8 +283,9 @@ function parseAndCalculateProfile(rawInput, apiKey) {
     astroData = { sun: "Unknown", moon: mathMoonSign, rising: "Unknown" };
   }
 
-  // Force override Moon with Math result (Safety Net)
+  // Force override with Math results (Safety Net)
   astroData.moon = mathMoonSign;
+  astroData.nodes = { north: mathNodes.north, south: mathNodes.south };
 
   return {
     name: normalized.name,
@@ -266,6 +293,8 @@ function parseAndCalculateProfile(rawInput, apiKey) {
     dob: normalized.date,
     tob: normalized.time,
     place: normalized.place,
+    currentYear: currentYear,
+    nextYear: nextYear,
     
     ...astroData,
     
@@ -275,42 +304,52 @@ function parseAndCalculateProfile(rawInput, apiKey) {
 
 // --- MOON SIGN ALGORITHM (Approximate) ---
 function calculateApproxMoonSign(year, month, day) {
-  // This is a simplified calculation logic for Moon Geocentric Longitude
-  // Accuracy: ~95%. Sufficient for general astrology.
-  // Returns the Mongolian Name of the Sign (e.g., "Хонь", "Үхэр")
-
   let ip = (x) => x - Math.floor(x);
+  let y = year, m = month;
+  if (m <= 2) { y -= 1; m += 12; }
+  let a = Math.floor(y / 100);
+  let b = 2 - a + Math.floor(a / 4);
+  let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
+  let days = jd - 2451545.0;
+  let L = ip((218.316 + 13.176396 * days) / 360) * 360;
+  let M = ip((134.963 + 13.064993 * days) / 360) * 360 * (Math.PI / 180);
+  let lambda = L + 6.289 * Math.sin(M);
+  lambda = (lambda % 360 + 360) % 360;
+  const signs = ["Хонь", "Үхэр", "Ихэр", "Мэлхий", "Арслан", "Охин", "Жинлүүр", "Хилэнц", "Нум", "Матар", "Хумх", "Загас"];
+  return signs[Math.floor(lambda / 30)];
+}
 
-  // Julian Date
+// --- NODE ALGORITHM (Approximate) ---
+function calculateApproxNodes(year, month, day) {
+  // Mean Node Cycle: ~18.6 years (Retrograde)
+  // Base date: Jan 11 2024 (North Node in Aries ~20 deg)
+  // 2024.03 = 2460320 JD
   let y = year, m = month;
   if (m <= 2) { y -= 1; m += 12; }
   let a = Math.floor(y / 100);
   let b = 2 - a + Math.floor(a / 4);
   let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
 
-  // Days since J2000.0
-  let days = jd - 2451545.0;
+  // Formula for Mean Longitude of Ascending Node (Omega)
+  let T = (jd - 2451545.0) / 36525;
+  let omega = 125.04452 - 1934.136261 * T;
 
-  // Moon Longitude (L)
-  let L = ip((218.316 + 13.176396 * days) / 360) * 360;
-  // Moon Anomaly (M)
-  let M = ip((134.963 + 13.064993 * days) / 360) * 360 * (Math.PI / 180);
-  // Moon Distance (F)
-  let F = ip((93.272 + 13.229350 * days) / 360) * 360 * (Math.PI / 180);
+  omega = (omega % 360 + 360) % 360;
 
-  // Correction
-  let lambda = L + 6.289 * Math.sin(M);
-  // Normalize to 0-360
-  lambda = (lambda % 360 + 360) % 360;
+  const signs = ["Хонь", "Үхэр", "Ихэр", "Мэлхий", "Арслан", "Охин", "Жинлүүр", "Хилэнц", "Нум", "Матар", "Хумх", "Загас"];
+  // Nodes move backward, so logic is inverted or handled by standard degree mapping (0 Aries, 30 Taurus...)
+  // But wait, 0-30 is Aries? No. 0 is First Point of Aries.
+  // Standard Zodiac: 0-30 Aries, 30-60 Taurus.
+  // Example: Omega = 10 deg -> Aries. Omega = 350 deg -> Pisces.
 
-  const signs = [
-    "Хонь", "Үхэр", "Ихэр", "Мэлхий",
-    "Арслан", "Охин", "Жинлүүр", "Хилэнц",
-    "Нум", "Матар", "Хумх", "Загас"
-  ];
+  const index = Math.floor(omega / 30);
+  // South Node is always exactly opposite (180 deg away)
+  const southIndex = (index + 6) % 12;
 
-  const index = Math.floor(lambda / 30);
-  return signs[index];
+  return {
+    north: signs[index],
+    south: signs[southIndex]
+  };
 }
 
 function normalizeInputWithAI(raw, model, key) {
@@ -358,7 +397,6 @@ function callGemini(text, key) {
 function generateFullReport(p, apiKey) {
   const systemPrompt = `
     ROLE: ${CONFIG.AI_SETTINGS.ROLE}
-    CONTEXT: ${CONFIG.AI_SETTINGS.CURRENT_CONTEXT}
     DATA: Use this JSON profile strictly: ${p.fullProfileJson}
   `;
 
@@ -367,7 +405,6 @@ function generateFullReport(p, apiKey) {
     let result = template;
     const map = {
       "{{jsonProfile}}": p.fullProfileJson,
-      "{{currentContext}}": CONFIG.AI_SETTINGS.CURRENT_CONTEXT,
       "{{name}}": p.name,
       "{{sun}}": p.sun,
       "{{moon}}": p.moon,
@@ -379,7 +416,9 @@ function generateFullReport(p, apiKey) {
       "{{seventhHouseSign}}": p.seventhHouseSign,
       "{{seventhHouseRuler}}": p.seventhHouseRuler,
       "{{northNode}}": p.northNode,
-      "{{southNode}}": p.southNode
+      "{{southNode}}": p.southNode,
+      "{{currentYear}}": p.currentYear,
+      "{{nextYear}}": p.nextYear
     };
     for (const [key, val] of Object.entries(map)) {
       result = result.split(key).join(val);
