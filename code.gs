@@ -1,35 +1,26 @@
 /****************************************************************************************
- * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v6.0 - FINAL POLISHED)
- * VERSION: v6.0 - Math Nodes, Natural Language, & Educational Intros
+ * PRODUCT: LOVE & KARMA REPORT GENERATOR (ZURHAI AI v7.0 - MASTER CONTEXT)
+ * VERSION: v7.0 - Context Chaining & Deep Karma Analysis
  * AUTHOR: Saruulbat System (Refactored by Jules)
  * MODEL: gemini-2.5-flash
  ****************************************************************************************/
 
 const CONFIG = {
   // --- SYSTEM CONFIG ---
-  VERSION: "v6.0-FinalPolished",
+  VERSION: "v7.0-MasterContext",
   PRODUCT_NAME: "Хайрын Карма & Заяаны Хань - Дэлгэрэнгүй Тайлан",
   SHEET_NAME: "Sheet1",
   BATCH_SIZE: 3, 
   GEMINI_MODEL: "gemini-2.5-flash", 
-  TEMPERATURE: 0.6, // Slightly higher for more natural, non-robotic flow
+  TEMPERATURE: 0.6,
 
-  // ⚙️ CONFIGURATION (EDIT THIS SECTION)
-  FOLDER_ID: "1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j", // Replace with your Google Drive Folder ID
-  DEFAULT_TIME: "12:00", // Fallback time if unknown
+  // ⚙️ CONFIGURATION
+  FOLDER_ID: "1Rfy1Pwk5kF_BmY2nLwFpj9Yss5B1Dq3j",
+  DEFAULT_TIME: "12:00",
 
-  // --- COLUMN MAPPING (0-based) ---
+  // --- COLUMN MAPPING ---
   COLUMNS: {
-    NAME: 0,      // A
-    ID: 1,        // B
-    INPUT: 2,     // C
-    PDF: 3,       // D
-    STATUS: 4,    // E
-    TOKEN: 5,     // F
-    DEBUG: 6,     // G
-    DATE: 7,      // H
-    VER: 8,       // I
-    ERROR: 9      // J
+    NAME: 0, ID: 1, INPUT: 2, PDF: 3, STATUS: 4, TOKEN: 5, DEBUG: 6, DATE: 7, VER: 8, ERROR: 9
   },
 
   MAX_EXECUTION_TIME: 360000, 
@@ -41,98 +32,70 @@ const CONFIG = {
   
   AI_SETTINGS: {
     ROLE: `
-    You are an expert Mongolian Astrologer and Psychologist.
-    Your goal is to write a deeply personal, accurate, and educational report.
+    You are an expert Mongolian Astrologer. Write a deep, connected, book-like report.
 
-    CRITICAL RULES:
-    1. **VOCABULARY:** NEVER use 'Знак' (Znak), 'Харваач' (Harvaach), 'Асцендент'.
-       - USE: 'Орд' (Ord), 'Нум' (Num), 'Мандах орд' (Rising).
-       - Always translate planet names: Jupiter -> Бархасбадь, Venus -> Сугар, Mars -> Ангараг, Mercury -> Буд, Saturn -> Санчир.
-    2. **TONE:** Avoid robotic/translated phrases like "Сэтгэл санаа өргөн цар хүрээтэй".
-       - USE Natural Mongolian: "Сэтгэл санаа уужуу тайван", "Алитыг том зургаар хардаг".
-    3. **TRUTH:** Use the provided CALCULATED DATA (Moon, Nodes) as absolute fact. Do not recalculate.
+    STRICT RULES:
+    1. **NO META-TALK:** Never say "Here is Part 2", "Continuing...", "Understood". Just write the report content.
+    2. **VOCABULARY:** Use 'Орд' (Ord), 'Нум' (Num), 'Мандах орд'. NO 'Знак', 'Харваач'.
+    3. **CONNECTION:** Reference the user's previous chapters to ensure flow.
+    4. **TONE:** Professional, empathetic, direct. No flowery greetings like "Dear brother".
     `,
 
-    // This prompt calculates the "Truth" (Planetary Positions) before writing.
+    // Calculation Prompt (Unchanged)
     CALCULATION_PROMPT: `
-    TASK: Calculate the Astrological Chart.
-    INPUT:
-    - Name: {{name}}
-    - Date: {{dob}}
-    - Time: {{tob}}
-    - Place: {{place}}
-    - CALCULATED MOON SIGN: {{mathMoon}} (TRUST THIS!)
-    - CALCULATED NODES: North={{mathNorthNode}}, South={{mathSouthNode}} (TRUST THIS!)
-    
-    INSTRUCTIONS:
-    1. Sun Sign: Calculate based on Date.
-    2. Moon Sign: USE THE PROVIDED 'CALCULATED MOON SIGN'.
-    3. Rising Sign (Ascendant): Estimate based on Time {{tob}} and Sun Sign.
-    4. 7th House: Opposite of Rising Sign.
-    5. Nodes: USE THE PROVIDED 'CALCULATED NODES'.
-
-    RETURN ONLY JSON:
-    {
-      "sun": "SignName",
-      "moon": "{{mathMoon}}",
-      "rising": "SignName",
-      "lifePath": "Number",
-      "isMasterNumber": boolean,
-      "elements": { "dominant": "Element", "missing": "Element" },
-      "seventhHouse": { "sign": "SignName", "ruler": "PlanetName" },
-      "nodes": { "north": "{{mathNorthNode}}", "south": "{{mathSouthNode}}" }
-    }
+    TASK: Calculate Astrological Chart.
+    INPUT: Name:{{name}}, Date:{{dob}}, Time:{{tob}}, Place:{{place}}, Moon:{{mathMoon}}, Nodes:{{mathNorthNode}}/{{mathSouthNode}}
+    INSTRUCTIONS: Use provided Moon/Nodes as truth. Calculate Sun, Rising, 7th House.
+    RETURN JSON: { "sun": "Sign", "moon": "Sign", "rising": "Sign", "lifePath": "Num", "isMasterNumber": bool, "elements": {"dominant": "El", "missing": "El"}, "seventhHouse": {"sign": "Sign", "ruler": "Planet"}, "nodes": {"north": "Sign", "south": "Sign"} }
     `,
 
-    // --- CHAPTER PROMPTS ---
+    // --- CHAPTER PROMPTS (With Context Injection) ---
     PROMPTS: {
       PART_1: `
-      CONTEXT: Use this DATA: {{jsonProfile}}
+      CONTEXT: Use DATA: {{jsonProfile}}
       
       **БҮЛЭГ 1. ТАНЫ ЭНЕРГИЙН КОД**
       
       **1.1 ТАНЫ ЭНЕРГИЙН БҮТЭЦ: ГУРВАН ТУЛГУУР БАГАНА**
 
       **НАР (Ухамсар): {{sun}} Орд**
-      *Боловсрол:* Нар бол таны мөн чанар, "Би хэн бэ?" гэдгийг тодорхойлогч гол эрхэс юм. Энэ нь таны амьдралын зорилго, ертөнцийг үзэх үзлийн суурийг тавьдаг.
-      *Тайлбар:* Таны Нар {{sun}} ордод байрласан тул... (Describe Ego).
+      *Нар бол таны мөн чанар, "Би хэн бэ?" гэдгийг тодорхойлогч гол эрхэс юм.*
+      Таны Нар {{sun}} ордод байрласан тул... (Explain Ego/Core).
 
       **САР (Сэтгэл хөдлөл): {{moon}} Орд**
-      *Боловсрол:* Сар бол таны далд ертөнц, сэтгэл хөдлөл, хүмүүст тэр бүр харагддаггүй дотоод хэрэгцээг илэрхийлдэг.
-      *Тайлбар:* Таны Сар {{moon}} ордод байрласнаар... (Describe Inner Emotions naturally).
+      *Сар бол таны далд ертөнц, сэтгэл хөдлөл, дотоод хэрэгцээг илэрхийлдэг.*
+      Таны Сар {{moon}} ордод байрласнаар... (Explain Emotions).
 
       **МАНДАХ ОРД (Гадаад төрх): {{rising}} Орд**
-      *Боловсрол:* Мандах орд бол таны "Нийгмийн баг" буюу бусдад анх харагдах төрх, биеийн хэлэмж юм.
-      *Тайлбар:* Таныг төрөх үед тэнгэрийн хаяанд {{rising}} орд мандаж байсан тул... (Describe Persona).
+      *Мандах орд бол таны "Нийгмийн баг" буюу бусдад харагдах төрх юм.*
+      Таныг төрөх үед {{rising}} орд мандаж байсан тул... (Explain Mask).
 
       **1.2 ТАНЫ "ЧИГЛЭЛ": АМЬДРАЛЫН ЗАМ**
-      *Боловсрол:* Нумерологийн ухаанд "Амьдралын зам" нь таны энэ амьдралд биелүүлэх ёстой үүрэг, хувь тавиланг заадаг.
-      *Тайлбар:* Таны тоо бол {{lifePath}}. (Master Number: {{isMasterNumber}}). (Explain destiny).
+      *Амьдралын зам нь таны энэ амьдралд биелүүлэх үүрэг, хувь тавиланг заадаг.*
+      Таны тоо бол {{lifePath}}. (Master Number: {{isMasterNumber}}). (Explain Destiny).
 
       **1.3 ЭНЕРГИЙН ТЭНЦВЭРИЙН ОНОШЛОГОО**
-      - Analyze Element Balance. What energy do they lack? Give practical advice on how to balance it.
-
-      (Write in natural, flowing Mongolian. No robotic lists.)
+      - Analyze Element Balance. Give practical advice.
       `,
 
       PART_2: `
-      CONTEXT: Use this DATA: {{jsonProfile}}
-      FOCUS: 7th House is {{seventhHouseSign}} (Ruler: {{seventhHouseRuler}}).
+      CONTEXT: Use DATA: {{jsonProfile}}
+      PREVIOUS CHAPTER (For Flow): {{prevText}}
 
       **БҮЛЭГ 2. ЗАЯАНЫ ХАНИЙН ПРОФАЙЛ**
 
       **2.1 ОГТОРГУЙН ЗОХИЦОЛ**
-      *Боловсрол:* Зурхайн 7-р гэр нь "Бид" буюу хосын харилцааг илэрхийлдэг. Энэ гэр нь таны Мандах ордны яг эсрэг талд байрладаг тул танд дутагдаж буй энергийг нөхөх хүнийг заадаг.
-      *Тайлбар:* Таны 7-р гэр {{seventhHouseSign}} ордод байгаа тул танд... (Explain opposite energy need).
+      *Зурхайн 7-р гэр нь таныг нөхөх энергийг заадаг.*
+      Таны Мандах орд {{rising}} тул 7-р гэр тань {{seventhHouseSign}}-д байна. Энэ нь... (Explain opposite energy need).
 
       **2.2 ТАНЫГ НӨХӨХ ДҮР БУЮУ ЗАЯА ХАНИЙН ШИНЖ**
-      - Describe the partner based on {{seventhHouseRuler}} & {{seventhHouseSign}}. (Soft vs Strong, Intellectual vs Emotional).
+      - Describe partner ({{seventhHouseRuler}} & {{seventhHouseSign}}).
 
       **2.3 МАГАДЛАЛТАЙ МЭРГЭЖИЛ БА ГАДААД ТӨРХ**
-      - Career and Appearance prediction.
+      - Career and Appearance.
 
       **2.4 САНХҮҮГИЙН ЧАДАМЖ**
-      - Financial potential analysis.
+      - Financial potential.
 
       **2.5 ТАНИХ ТЭМДЭГ: ЭЕРЭГ ДОХИО**
       - 3 Green Flags.
@@ -142,30 +105,40 @@ const CONFIG = {
       `,
 
       PART_3: `
-      CONTEXT: Use this DATA: {{jsonProfile}}
-      FOCUS: South Node is in {{southNode}}. North Node is in {{northNode}}.
-      CURRENT YEAR: {{currentYear}}
-      NEXT YEAR: {{nextYear}}
+      CONTEXT: Use DATA: {{jsonProfile}}
+      PREVIOUS CHAPTER (For Flow): {{prevText}}
+      FOCUS: South Node is {{southNode}}.
 
       **БҮЛЭГ 3. ХАЙРЫН КАРМА: ТАНЫ ДАВТАХ ЁСГҮЙ АЛДАА**
 
       **3.1 - 3.3 КАРМЫН БАГШ НАР**
-      *Боловсрол:* Сарны Өмнөд Зангилаа (South Node) нь таны өнгөрсөн амьдралын дадал зуршил, тав тухтай бүсийг илэрхийлдэг. Бид ихэвчлэн эндээ гацаж, буруу хүмүүсийг татдаг.
-      *Тайлбар:* Таны Өмнөд Зангилаа {{southNode}} ордод байрладаг. Та яагаад дандаа... (Describe toxic patterns).
-      - Describe 3 "Karmic Teachers" (Toxic Types).
+      *Сарны Өмнөд Зангилаа ({{southNode}}) нь таны өнгөрсөн амьдралын дадал зуршил, гацдаг цэгийг харуулна.*
+      Таны амьдралд давтагддаг "Кармын Багш" нар буюу зайлсхийх ёстой 3 төрлийн хүн:
+
+      1. **[Type Name]:** (Description of trait).
+         - **Нөлөө:** (How they hurt/manipulate you specifically. e.g., "They leave you without closure", "They make you feel small").
+         - **Сургамж:** (What you must learn).
+
+      2. **[Type Name]:** ...
+      3. **[Type Name]:** ...
 
       **3.4 ОНЦГОЙ НӨЛӨӨЛӨЛ (Сэтгэл зүйн урхи)**
-      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}).
+      - Conflict between Moon ({{moon}}) and Life Path ({{lifePath}}). Head vs Heart.
+      `,
+
+      PART_4: `
+      CONTEXT: Use DATA: {{jsonProfile}}
+      PREVIOUS CHAPTER (For Flow): {{prevText}}
+      YEARS: {{currentYear}}, {{nextYear}}
 
       **БҮЛЭГ 4. УЧРАЛЫН ЦАГ ХУГАЦАА: КАРМЫН ШАЛГАЛТ**
 
       **4.1 ЦЭВЭРЛЭГЭЭНИЙ ЖИЛ ({{currentYear}} он)**
-      *Боловсрол:* Шинэ зүйл хүлээж авахын тулд хуучнаа цэвэрлэх ёстой.
-      *Тайлбар:* Энэ онд та... (Preparation advice).
+      - Advice for {{currentYear}}. How to prepare?
 
       **4.2 ИХ АЗ ЖАРГАЛЫН МӨЧЛӨГ ({{nextYear}} он)**
-      *Боловсрол:* Бархасбадь гараг нь "Их Аз Жаргал"-ыг бэлгэддэг бөгөөд 12 жилд нэг удаа таныг ивээдэг.
-      *Тайлбар:* {{nextYear}} онд Бархасбадь Мэлхий (Cancer) ордод байрлах (эсвэл шилжих) үед... (Prediction for {{seventhHouseSign}}).
+      *Бархасбадь гараг нь 12 жилд нэг удаа таны хайрын гэрийг ивээдэг.*
+      - Prediction for {{nextYear}} when Jupiter enters/transits {{seventhHouseSign}} (or relevant aspect).
       `
     }
   },
@@ -208,10 +181,10 @@ function main() {
         const inputString = String(row[CONFIG.COLUMNS.INPUT]); 
         const contactId = row[CONFIG.COLUMNS.ID];
         
-        // 1. CALCULATE PROFILE (Math + AI)
+        // 1. CALCULATE PROFILE
         const profile = parseAndCalculateProfile(inputString, KEYS.GEMINI);
         
-        // 2. GENERATE REPORT
+        // 2. GENERATE REPORT (Chained)
         const reportResult = generateFullReport(profile, KEYS.GEMINI);
         
         // 3. CREATE PDF
@@ -250,20 +223,16 @@ function main() {
 // ==========================================
 
 function parseAndCalculateProfile(rawInput, apiKey) {
-  // 1. Normalize
   const normalized = normalizeInputWithAI(rawInput, CONFIG.GEMINI_MODEL, apiKey);
   const [year, month, day] = normalized.date.split(".").map(Number);
 
-  // 2. MATH CALCULATION (Moon & Nodes)
   const mathMoonSign = calculateApproxMoonSign(year, month, day);
   const mathNodes = calculateApproxNodes(year, month, day);
 
-  // 3. DATE LOGIC
   const now = new Date();
   const currentYear = now.getFullYear();
   const nextYear = currentYear + 1;
 
-  // 4. AI Calculation (The rest)
   const calcPrompt = CONFIG.AI_SETTINGS.CALCULATION_PROMPT
     .replace("{{name}}", normalized.name)
     .replace("{{dob}}", normalized.date)
@@ -279,11 +248,9 @@ function parseAndCalculateProfile(rawInput, apiKey) {
     const cleanJson = result.text.replace(/```json/g, "").replace(/```/g, "").trim();
     astroData = JSON.parse(cleanJson);
   } catch (e) {
-    console.error("AI Calc Error", e);
     astroData = { sun: "Unknown", moon: mathMoonSign, rising: "Unknown" };
   }
 
-  // Force override with Math results (Safety Net)
   astroData.moon = mathMoonSign;
   astroData.nodes = { north: mathNodes.north, south: mathNodes.south };
 
@@ -295,94 +262,60 @@ function parseAndCalculateProfile(rawInput, apiKey) {
     place: normalized.place,
     currentYear: currentYear,
     nextYear: nextYear,
-    
     ...astroData,
-    
     fullProfileJson: JSON.stringify(astroData)
   };
 }
 
-// --- MOON SIGN ALGORITHM (Approximate) ---
+// --- MATH FUNCTIONS ---
 function calculateApproxMoonSign(year, month, day) {
   let ip = (x) => x - Math.floor(x);
   let y = year, m = month;
   if (m <= 2) { y -= 1; m += 12; }
-  let a = Math.floor(y / 100);
-  let b = 2 - a + Math.floor(a / 4);
+  let a = Math.floor(y / 100), b = 2 - a + Math.floor(a / 4);
   let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
   let days = jd - 2451545.0;
   let L = ip((218.316 + 13.176396 * days) / 360) * 360;
   let M = ip((134.963 + 13.064993 * days) / 360) * 360 * (Math.PI / 180);
-  let lambda = L + 6.289 * Math.sin(M);
-  lambda = (lambda % 360 + 360) % 360;
+  let lambda = (L + 6.289 * Math.sin(M)) % 360;
+  if (lambda < 0) lambda += 360;
   const signs = ["Хонь", "Үхэр", "Ихэр", "Мэлхий", "Арслан", "Охин", "Жинлүүр", "Хилэнц", "Нум", "Матар", "Хумх", "Загас"];
   return signs[Math.floor(lambda / 30)];
 }
 
-// --- NODE ALGORITHM (Approximate) ---
 function calculateApproxNodes(year, month, day) {
-  // Mean Node Cycle: ~18.6 years (Retrograde)
-  // Base date: Jan 11 2024 (North Node in Aries ~20 deg)
-  // 2024.03 = 2460320 JD
   let y = year, m = month;
   if (m <= 2) { y -= 1; m += 12; }
-  let a = Math.floor(y / 100);
-  let b = 2 - a + Math.floor(a / 4);
+  let a = Math.floor(y / 100), b = 2 - a + Math.floor(a / 4);
   let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
-
-  // Formula for Mean Longitude of Ascending Node (Omega)
   let T = (jd - 2451545.0) / 36525;
-  let omega = 125.04452 - 1934.136261 * T;
-
-  omega = (omega % 360 + 360) % 360;
-
+  let omega = (125.04452 - 1934.136261 * T) % 360;
+  if (omega < 0) omega += 360;
   const signs = ["Хонь", "Үхэр", "Ихэр", "Мэлхий", "Арслан", "Охин", "Жинлүүр", "Хилэнц", "Нум", "Матар", "Хумх", "Загас"];
-  // Nodes move backward, so logic is inverted or handled by standard degree mapping (0 Aries, 30 Taurus...)
-  // But wait, 0-30 is Aries? No. 0 is First Point of Aries.
-  // Standard Zodiac: 0-30 Aries, 30-60 Taurus.
-  // Example: Omega = 10 deg -> Aries. Omega = 350 deg -> Pisces.
-
   const index = Math.floor(omega / 30);
-  // South Node is always exactly opposite (180 deg away)
   const southIndex = (index + 6) % 12;
-
-  return {
-    north: signs[index],
-    south: signs[southIndex]
-  };
+  return { north: signs[index], south: signs[southIndex] };
 }
 
 function normalizeInputWithAI(raw, model, key) {
   const prompt = `
     TASK: Normalize input.
     INPUT: "${raw}"
-    RULES:
-    - If time is missing/unknown, use "${CONFIG.DEFAULT_TIME}".
-    - Place default: "Mongolia".
-    - Date format: YYYY.MM.DD.
+    RULES: If time unknown use "${CONFIG.DEFAULT_TIME}". Default Place: "Mongolia". Date: YYYY.MM.DD.
     RETURN JSON: { "name": "", "date": "", "time": "", "place": "" }
   `;
   try {
-    const result = callGemini(prompt, key); 
-    const cleanJson = result.text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleanJson);
+    const result = callGemini(prompt, key);
+    return JSON.parse(result.text.replace(/```json/g, "").replace(/```/g, "").trim());
   } catch (e) {
     const parts = raw.split("-");
-    return {
-      name: parts[0] ? parts[0].trim() : "Unknown",
-      date: parts[1] ? parts[1].trim() : "2000.01.01",
-      time: CONFIG.DEFAULT_TIME,
-      place: "Mongolia"
-    };
+    return { name: parts[0] ? parts[0].trim() : "Unknown", date: parts[1] ? parts[1].trim() : "2000.01.01", time: CONFIG.DEFAULT_TIME, place: "Mongolia" };
   }
 }
 
 function callGemini(text, key) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${key}`;
-  const payload = {
-    contents: [{ parts: [{ text: text }] }],
-    generationConfig: { temperature: CONFIG.TEMPERATURE, maxOutputTokens: 8192 }
-  };
+  const payload = { contents: [{ parts: [{ text: text }] }], generationConfig: { temperature: CONFIG.TEMPERATURE, maxOutputTokens: 8192 } };
   const options = { method: "post", contentType: "application/json", payload: JSON.stringify(payload), muteHttpExceptions: true };
   const res = UrlFetchApp.fetch(url, options);
   const json = JSON.parse(res.getContentText());
@@ -391,20 +324,17 @@ function callGemini(text, key) {
 }
 
 // ==========================================
-// 2. GENERATION & PDF
+// 2. GENERATION (CHAINED CONTEXT)
 // ==========================================
 
 function generateFullReport(p, apiKey) {
-  const systemPrompt = `
-    ROLE: ${CONFIG.AI_SETTINGS.ROLE}
-    DATA: Use this JSON profile strictly: ${p.fullProfileJson}
-  `;
+  const systemPrompt = `ROLE: ${CONFIG.AI_SETTINGS.ROLE} DATA: ${p.fullProfileJson}`;
 
-  // Helper to replace placeholders
-  const fill = (template) => {
+  const fill = (template, prevText) => {
     let result = template;
     const map = {
       "{{jsonProfile}}": p.fullProfileJson,
+      "{{prevText}}": prevText || "None",
       "{{name}}": p.name,
       "{{sun}}": p.sun,
       "{{moon}}": p.moon,
@@ -420,24 +350,26 @@ function generateFullReport(p, apiKey) {
       "{{currentYear}}": p.currentYear,
       "{{nextYear}}": p.nextYear
     };
-    for (const [key, val] of Object.entries(map)) {
-      result = result.split(key).join(val);
-    }
+    for (const [key, val] of Object.entries(map)) result = result.split(key).join(val);
     return result;
   };
 
-  const prompt1 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1);
+  // CHAINING REQUESTS (Sending Previous Text)
+  const prompt1 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_1, "");
   const r1 = callGemini(prompt1, apiKey);
 
-  const prompt2 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2);
+  const prompt2 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_2, r1.text);
   const r2 = callGemini(prompt2, apiKey);
 
-  const prompt3 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3);
+  const prompt3 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_3, r2.text);
   const r3 = callGemini(prompt3, apiKey);
 
+  const prompt4 = systemPrompt + "\n" + fill(CONFIG.AI_SETTINGS.PROMPTS.PART_4, r3.text);
+  const r4 = callGemini(prompt4, apiKey);
+
   return {
-    text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text,
-    usage: r1.usage + r2.usage + r3.usage
+    text: r1.text + "\n\n" + r2.text + "\n\n" + r3.text + "\n\n" + r4.text,
+    usage: r1.usage + r2.usage + r3.usage + r4.usage
   };
 }
 
