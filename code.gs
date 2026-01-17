@@ -97,6 +97,16 @@ const CONFIG = {
         **1. Гадаад төрх & Энерги:** (Describe appearance and aura)
         **2. Зан чанар:** (Describe personality)
         **3. Ажил мэргэжил:** (Describe profession using "High probability" language)
+        **4. ТАНЫ САНХҮҮГ ТЭТГЭХ 'МӨНГӨНИЙ ХҮН' (WEALTH ELEMENT):**
+           - Based on the user's element, their Wealth Element is **{{wealthElement}}**.
+           - Explain: "Та {{yearElement}} махбодьтой тул {{wealthElement}} махбодийн энергитэй хүн таны санхүүг тэтгэнэ."
+           - Identify WHO matches this element:
+             * Metal (Төмөр) Year: Ends in 0 or 1.
+             * Water (Усан) Year: Ends in 2 or 3.
+             * Wood (Модон) Year: Ends in 4 or 5.
+             * Fire (Гал) Year: Ends in 6 or 7.
+             * Earth (Шороон) Year: Ends in 8 or 9.
+           - Mention that partners with this element (by birth year) bring financial luck.
       
       **📖 БҮЛЭГ 4: УЧРАЛЫН МӨЧЛӨГ & ТОМ ХААЛГУУД**
       - Analyze these specific FUTURE "Golden Gates" (Age/Year Cycles):
@@ -303,7 +313,8 @@ function parseAndCalculateProfile(rawInput) {
     transit2026: transits.gate2, 
     transit2027: transits.gate3, 
     
-    elementRelationship: elementRel
+    elementRelationship: elementRel,
+    wealthElement: calculateWealthElement(mongolData.element)
   };
 }
 
@@ -447,6 +458,17 @@ function analyzeElementalConflict(yearEl, zodiacEl) {
   return "Холимог Энерги";
 }
 
+function calculateWealthElement(userElement) {
+  const map = {
+    "Модон": "Шороон",
+    "Гал": "Төмөр",
+    "Шороон": "Усан",
+    "Төмөр": "Модон",
+    "Усан": "Гал"
+  };
+  return map[userElement] || "Тодорхойгүй";
+}
+
 // ==========================================
 // 2. GENERATION ENGINE (CONFIG DRIVEN)
 // ==========================================
@@ -489,7 +511,8 @@ function generateFullReport(p, apiKey) {
     "{{forecastYear}}": forecastYear,
     "{{nextYearAnimal}}": nextYearAnimal,
     "{{timeInfoLine}}": timeInfoLine,
-    "{{timeAnalysisInstructions}}": timeAnalysisInstructions
+    "{{timeAnalysisInstructions}}": timeAnalysisInstructions,
+    "{{wealthElement}}": p.wealthElement
   };
 
   // 2. Build System Prompt (Role + Core Rules + User Profile)
